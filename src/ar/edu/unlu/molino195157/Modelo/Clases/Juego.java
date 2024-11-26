@@ -116,11 +116,12 @@ public class Juego implements Observado
         {
             return true;
         }
-        if(tablero.verificadorDeMolinos() == jugador1.getBando())
-        {
-            notificarObservador(Eventos.JUGADOR1MOLINO);
-        }
         return false;
+    }
+
+    public boolean verificarMolinoEnJuego(Bando bando)
+    {
+        return tablero.verificadorDeMolinos() == bando;
     }
 
     public boolean jugador1EliminaFichaJugador2(Posicion posicion)
@@ -134,10 +135,6 @@ public class Juego implements Observado
         {
             return true;
         }
-        if(tablero.verificadorDeMolinos() == jugador2.getBando())
-        {
-            notificarObservador(Eventos.JUGADOR2MOLINO);
-        }
         return false;
     }
 
@@ -147,7 +144,11 @@ public class Juego implements Observado
     }
 
     public boolean jugador1VerificarPosicion(Posicion posicion) {
-        return tablero.verificarFichaDelTablero(posicion).getBando() == jugador1.getBando();
+        if(tablero.verificarFichaDelTablero(posicion) != null)
+        {
+            return tablero.verificarFichaDelTablero(posicion).getBando() == jugador1.getBando();
+        }
+        return  false;
     }
 
     public boolean jugador1MueveFicha(Posicion posicionOriginal, Posicion posicion) {
@@ -163,7 +164,11 @@ public class Juego implements Observado
     }
 
     public boolean jugador2VerificarPosicion(Posicion posicion) {
-        return tablero.verificarFichaDelTablero(posicion).getBando() == jugador2.getBando();
+        if(tablero.verificarFichaDelTablero(posicion) != null)
+        {
+            return tablero.verificarFichaDelTablero(posicion).getBando() == jugador2.getBando();
+        }
+        return  false;
     }
 
     public boolean jugador2MueveFicha(Posicion posicionOriginal, Posicion posicion) {

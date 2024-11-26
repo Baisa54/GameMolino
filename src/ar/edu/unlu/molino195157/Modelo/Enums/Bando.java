@@ -4,5 +4,6 @@ public enum Bando
 {
     BLANCAS,
     NEGRAS,
-    NINGUNO //Para representar ausencia de molinos
+    NINGUNO, //Para representar ausencia de molinos
+    ELIMINADO
 }

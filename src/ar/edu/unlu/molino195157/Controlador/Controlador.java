@@ -39,12 +39,14 @@ public class Controlador implements Observador{
                 if(juego.ingresoFichaJugador1(this.posicionSeleccionada) && posicionSeleccionada != null)
                 {
                     vista.actualizarCasilla(this.posicionSeleccionada, juego.getJugador1().getBando());
-                    vista.deshabilitarBotones();
                 }
-                else
-                {
+                else {
                     vista.mostrarMensaje("Por favor, ingrese una posicion valida");
                     notificar(Eventos.INGRESOFICHAJUGADOR1);
+                }
+                if (juego.verificarMolinoEnJuego(juego.getJugador1().getBando()))
+                {
+                    notificar(Eventos.JUGADOR1MOLINO);
                 }
             }
             case JUGADOR1MOLINO -> {
@@ -53,8 +55,7 @@ public class Controlador implements Observador{
                 vista.iniciarAccionDelJugador();
                 if(juego.jugador1EliminaFichaJugador2(posicionSeleccionada))
                 {
-                    vista.actualizarCasilla(this.posicionSeleccionada, Bando.NINGUNO);
-                    vista.deshabilitarBotones();
+                    vista.actualizarCasilla(this.posicionSeleccionada, Bando.ELIMINADO);
                 }
                 else
                 {
@@ -66,16 +67,19 @@ public class Controlador implements Observador{
                 vista.mostrarMensaje("Jugador " + juego.getJugador2().getNombre() +" ingrese la posicion de la ficha");
 
                 vista.iniciarAccionDelJugador();
-                if(juego.ingresoFichaJugador1(this.posicionSeleccionada) && posicionSeleccionada != null)
+                if(juego.ingresoFichaJugador2(this.posicionSeleccionada) && posicionSeleccionada != null)
                 {
                     System.out.println(posicionSeleccionada.name());
                     vista.actualizarCasilla(this.posicionSeleccionada, juego.getJugador2().getBando());
-                    vista.deshabilitarBotones();
                 }
                 else
                 {
                     vista.mostrarMensaje("Por favor, ingrese una posicion valida");
                     notificar(Eventos.INGRESOFICHAJUGADOR2);
+                }
+                if (juego.verificarMolinoEnJuego(juego.getJugador2().getBando()))
+                {
+                    notificar(Eventos.JUGADOR2MOLINO);
                 }
 
             }
@@ -85,13 +89,12 @@ public class Controlador implements Observador{
                 vista.iniciarAccionDelJugador();
                 if(juego.jugador2EliminaFichaJugador1(posicionSeleccionada))
                 {
-                    vista.actualizarCasilla(this.posicionSeleccionada, Bando.NINGUNO);
-                    vista.deshabilitarBotones();
+                    vista.actualizarCasilla(this.posicionSeleccionada, Bando.ELIMINADO);
                 }
                 else
                 {
                     vista.mostrarMensaje("Por favor, ingrese una posicion valida");
-                    notificar(Eventos.JUGADOR1MOLINO);
+                    notificar(Eventos.JUGADOR2MOLINO);
                 }
             }
             case CANTIDADFICHASRESTANTES -> {
@@ -106,7 +109,7 @@ public class Controlador implements Observador{
                 vista.iniciarAccionDelJugador();
                 if(juego.jugador1VerificarPosicion(this.posicionSeleccionada))
                 {
-                    vista.deshabilitarBotones();
+                    // La ficha queda seleccionada en Controlador
                 }
                 else
                 {
@@ -120,7 +123,7 @@ public class Controlador implements Observador{
                 vista.iniciarAccionDelJugador();
                 if(juego.jugador2VerificarPosicion(this.posicionSeleccionada))
                 {
-                    vista.deshabilitarBotones();
+                    // La ficha queda seleccionada en Controlador
                 }
                 else
                 {
@@ -137,7 +140,6 @@ public class Controlador implements Observador{
                 {
                     vista.actualizarCasilla(posicionAnterior, Bando.NINGUNO);
                     vista.actualizarCasilla(posicionSeleccionada, juego.getJugador1().getBando());
-                    vista.deshabilitarBotones();
                 }
                 else
                 {
@@ -154,7 +156,6 @@ public class Controlador implements Observador{
                 {
                     vista.actualizarCasilla(posicionAnterior, Bando.NINGUNO);
                     vista.actualizarCasilla(posicionSeleccionada, juego.getJugador2().getBando());
-                    vista.deshabilitarBotones();
                 }
                 else
                 {

@@ -72,7 +72,11 @@ public class Jugador {
 
     public boolean ingresarFichaEliminada(Tablero tablero, Posicion posicion)
     {
-        if (tablero.verificarFichaDelTablero(posicion).getBando() == this.bando)
+        if (tablero.verificarFichaDelTablero(posicion) == null)
+        {
+            return false;
+        }
+        else if (tablero.verificarFichaDelTablero(posicion).getBando() == this.bando)
         {
             this.fichas.add(tablero.eliminarFichaDelTablero(posicion));
             this.cantidadDeFichasEliminadas += 1;

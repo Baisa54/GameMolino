@@ -52,7 +52,7 @@ public class TableroVista extends JFrame {
                     // Asignar acción al botón
                     botones[i][j].addActionListener(e -> {
                         if (controlador != null) {
-                            controlador.seleccionarPosicion(posEnum); // Llamamos al controlador para gestionar la selección
+                            controlador.seleccionarPosicion(posEnum); // Selección de posición
                             desbloquearAccion(); // Desbloqueamos la acción después de la selección
                         }
                     });
@@ -112,9 +112,10 @@ public class TableroVista extends JFrame {
                 botones[fila][columna].setBackground(Color.BLACK); // Ficha negra
                 botones[fila][columna].setText("N");
             }
-            case NINGUNO -> {
-                botones[fila][columna].setBackground(Color.DARK_GRAY); // Casilla vacía
-                botones[fila][columna].setText("");
+            case ELIMINADO -> {
+                botones[fila][columna].setBackground(Color.DARK_GRAY);
+                botones[fila][columna].setText("S/O");
+                botones[fila][columna].setEnabled(true);
             }
         }
     }
@@ -132,16 +133,16 @@ public class TableroVista extends JFrame {
         }
     }
 
-    // Metodo auxiliar para habilitar botones
     private void habilitarBoton(String texto) {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
-                if (botones[i][j].getText().equals(texto)) {
+                if (botones[i][j].getText().equals(texto) || "B".equals(botones[i][j].getText()) || "N".equals(botones[i][j].getText())) {
                     botones[i][j].setEnabled(true);
                 }
             }
         }
     }
+
 
     // Deshabilitar todos los botones
     public void deshabilitarBotones() {
