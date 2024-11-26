@@ -11,3 +11,5 @@ juego es alinear tres piezas en fila en un tablero de 3x3, bloqueando al
 oponente y creando oportunidades para moverse de manera más eficiente. Con cada 
 movimiento, los jugadores deben pensar con anticipación para poder reducir las
 opciones del rival y conseguir la victoria.
+
+![UML Diagrama](https://github.com/tu_usuario/tu_repositorio/raw/main/images/uml-diagrama.png)
