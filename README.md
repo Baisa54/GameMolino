@@ -15,4 +15,4 @@ Movimiento de piezas: Después de que todos los jugadores han colocado todas sus
 
 El objetivo del juego es crear tantos molinos como sea posible y eliminar las piezas del oponente. El primero que logre dejar al oponente con menos de tres piezas en el tablero, o que no pueda formar ningún molino, gana la partida.
 
-![UML Diagrama]([https://github.com/tu_usuario/tu_repositorio/raw/main/images/uml-diagrama.png](https://github.com/Baisa54/GameMolino/blob/master/Molino_POO.png))
+![UML Diagrama]([[https://github.com/tu_usuario/tu_repositorio/raw/main/images/uml-diagrama.png](https://github.com/Baisa54/GameMolino/blob/master/Molino_POO.png](https://github.com/Baisa54/GameMolino/blob/master/Molino_POO.png?raw=true)))
