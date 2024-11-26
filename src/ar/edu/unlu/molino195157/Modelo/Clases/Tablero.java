@@ -84,9 +84,6 @@ public class Tablero
         adyascentes.put(Posicion.G1, new Adyascente(Posicion.D1, Posicion.G4));
         adyascentes.put(Posicion.G4, new Adyascente(Posicion.G1, Posicion.F4, Posicion.G7));
         adyascentes.put(Posicion.G7, new Adyascente(Posicion.D7, Posicion.G4));
-
-
-
     }
 
     //-------------------------------------------------------------------------------------

@@ -153,7 +153,7 @@ public class TableroVista extends JFrame {
         }
     }
 
-    // Método bloqueante para esperar que el jugador haga su acción
+    // Metodo bloqueante para esperar que el jugador haga su acción
     public void AccionDelJugador() {
         latch = new CountDownLatch(1); // Reinicia el CountDownLatch cada vez que comienza una nueva acción
 
@@ -171,13 +171,13 @@ public class TableroVista extends JFrame {
         System.out.println("Jugador ha hecho su acción, continuamos.");
     }
 
-    // Método que es llamado por el controlador para iniciar la espera
+    // Metodo que es llamado por el controlador para iniciar la espera
     public void iniciarAccionDelJugador() {
-        // Este método es llamado cuando el controlador requiere que el jugador haga una acción
+        // Este metodo es llamado cuando el controlador requiere que el jugador haga una acción
         AccionDelJugador();
     }
 
-    // Método para que el controlador desbloquee la ejecución una vez el jugador haya seleccionado una posición
+    // Metodo para que el controlador desbloquee la ejecución una vez el jugador haya seleccionado una posición
     public void desbloquearAccion() {
         if (latch != null) {
             latch.countDown(); // Liberar el latch y continuar

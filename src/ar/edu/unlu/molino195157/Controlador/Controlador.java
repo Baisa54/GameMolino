@@ -138,7 +138,7 @@ public class Controlador implements Observador{
                 vista.iniciarAccionDelJugador();
                 if(juego.jugador1MueveFicha(posicionAnterior, posicionSeleccionada))
                 {
-                    vista.actualizarCasilla(posicionAnterior, Bando.NINGUNO);
+                    vista.actualizarCasilla(posicionAnterior, Bando.ELIMINADO);
                     vista.actualizarCasilla(posicionSeleccionada, juego.getJugador1().getBando());
                 }
                 else
@@ -148,13 +148,13 @@ public class Controlador implements Observador{
                 }
             }
             case MUEVEJUGADOR2CASILLA -> {
-                Posicion posicionAnterior = this.posicionSeleccionada;
+                Posicion posicionAnterior = this.posicionSeleccionada; //
                 vista.mostrarMensaje("Jugador " + juego.getJugador2().getNombre() +" Seleccione la posicion a mover");
 
                 vista.iniciarAccionDelJugador();
                 if(juego.jugador2MueveFicha(posicionAnterior, posicionSeleccionada))
                 {
-                    vista.actualizarCasilla(posicionAnterior, Bando.NINGUNO);
+                    vista.actualizarCasilla(posicionAnterior, Bando.ELIMINADO);
                     vista.actualizarCasilla(posicionSeleccionada, juego.getJugador2().getBando());
                 }
                 else
