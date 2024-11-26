@@ -12,4 +12,4 @@ oponente y creando oportunidades para moverse de manera más eficiente. Con cada
 movimiento, los jugadores deben pensar con anticipación para poder reducir las
 opciones del rival y conseguir la victoria.
 
-![UML Diagrama](https://github.com/tu_usuario/tu_repositorio/raw/main/images/uml-diagrama.png)
+![UML Diagrama]([https://github.com/tu_usuario/tu_repositorio/raw/main/images/uml-diagrama.png](https://github.com/Baisa54/GameMolino/blob/master/Molino_POO.png))
