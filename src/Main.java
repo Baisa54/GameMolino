@@ -1,16 +1,10 @@
-import ar.edu.unlu.molino195157.Ficha;
-import ar.edu.unlu.molino195157.Jugador;
-import ar.edu.unlu.molino195157.Posicion;
-import ar.edu.unlu.molino195157.Tablero;
+import ar.edu.unlu.molino195157.Controlador.Controlador;
+import ar.edu.unlu.molino195157.Modelo.Clases.Juego;
+import ar.edu.unlu.molino195157.Vista.Vista;
 
-public class Main
-{
-    public static void main(String[] args)
-    {
-        Jugador jugador = new Jugador();
-        Ficha ficha = new Ficha(jugador);
-        Tablero tablero = new Tablero();
-        tablero.ocuparPosicion("A1", ficha);
-        tablero.mostrarPosiciones();
+public class Main {
+    public static void main(String[] args) {
+
     }
 }
+
