@@ -100,6 +100,10 @@ public class Tablero
     public boolean ocuparPosicion(Posicion posi, Ficha ficha)
     {
         Casilla casilla = posiciones.get(posi);
+        if (casilla == null) {
+            System.out.println("Error: La posición " + posi + " no está mapeada.");
+            return false;
+        }
         if(!casilla.isOcupado())
         {
             casilla.asignarFicha(ficha);
@@ -110,6 +114,7 @@ public class Tablero
             return false;
         }
     }
+
 
     public Casilla obtenerCasilla(Posicion posicion)
     {

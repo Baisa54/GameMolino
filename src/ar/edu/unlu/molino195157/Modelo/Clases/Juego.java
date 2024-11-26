@@ -7,7 +7,6 @@ import ar.edu.unlu.molino195157.Observer.Observado;
 import ar.edu.unlu.molino195157.Observer.Observador;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Juego implements Observado
 {
@@ -26,12 +25,14 @@ public class Juego implements Observado
     // Constructor
     //-------------------------------------------------------------------------------------
 
-    public Juego(String nombre1, String nombre2)
+    public Juego(String nombre1, String nombre2, Observador observador)
     {
         this.tablero = new Tablero();
         this.jugador1 = new Jugador(nombre1, Bando.BLANCAS);
         this.jugador2 = new Jugador(nombre2, Bando.NEGRAS);
         this.fase = Fase.PRIMERFASE;
+        this.observadores = new ArrayList<>();
+        this.observadores.add(observador);
     }
 
     //-------------------------------------------------------------------------------------
@@ -45,6 +46,7 @@ public class Juego implements Observado
     public Jugador getJugador2() {
         return jugador2;
     }
+
 
     //-------------------------------------------------------------------------------------
     // Metodos
