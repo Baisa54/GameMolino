@@ -143,16 +143,6 @@ public class TableroVista extends JFrame {
         }
     }
 
-
-    // Deshabilitar todos los botones
-    public void deshabilitarBotones() {
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-                botones[i][j].setEnabled(false);
-            }
-        }
-    }
-
     // Metodo bloqueante para esperar que el jugador haga su acción
     public void AccionDelJugador() {
         latch = new CountDownLatch(1); // Reinicia el CountDownLatch cada vez que comienza una nueva acción
