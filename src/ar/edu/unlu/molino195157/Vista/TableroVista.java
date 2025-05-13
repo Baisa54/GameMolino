@@ -174,4 +174,4 @@ public class TableroVista extends JFrame {
         }
     }
 }
-//Bueno, vamos con version 2
+//Bueno, vamos con version 2.
