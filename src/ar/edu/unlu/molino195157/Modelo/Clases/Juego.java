@@ -1,186 +1,171 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 import ar.edu.unlu.molino195157.Modelo.Enums.Bando;
-import ar.edu.unlu.molino195157.Modelo.Enums.Eventos;
 import ar.edu.unlu.molino195157.Modelo.Enums.Fase;
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
-import ar.edu.unlu.molino195157.Observer.Observado;
-import ar.edu.unlu.molino195157.Observer.Observador;
+import ar.edu.unlu.molino195157.Modelo.Interfaces.IJuego;
+import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 
-import java.util.ArrayList;
-
-public class Juego implements Observado
-{
+public class Juego extends ObservableRemoto implements IJuego {
     //-------------------------------------------------------------------------------------
     // Atributos
     //-------------------------------------------------------------------------------------
 
+    //Atributos Clase
     private Jugador jugador1;
     private Jugador jugador2;
     private Tablero tablero;
-    private Posicion posi;
     private Fase fase;
-    private ArrayList<Observador> observadores;
+
+    //Atributos Propios
+    private String nombreSala;
+    private boolean privada;
+    private String contrasena;
+    private int turnoDeLaPartida;
+    private boolean eliminarFichas;
+    private int fichasEliminadasJugador1;
+    private int fichasEliminadasJugador2;
+
 
     //-------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------
 
-    public Juego(String nombre1, String nombre2, Observador observador)
+    public Juego(String nombreSala, String contrasena, boolean privada, Jugador jugador1)
     {
+        this.contrasena = contrasena;
+        this.fase = Fase.SIN_COMENZAR;
+        this.jugador1 = jugador1;
+        this.nombreSala = nombreSala;
+        this.privada = privada;
         this.tablero = new Tablero();
-        this.jugador1 = new Jugador(nombre1, Bando.BLANCAS);
-        this.jugador2 = new Jugador(nombre2, Bando.NEGRAS);
-        this.fase = Fase.PRIMERFASE;
-        this.observadores = new ArrayList<>();
-        this.observadores.add(observador);
+        this.turnoDeLaPartida = 1;
+        this.eliminarFichas = false;
+        this.fichasEliminadasJugador1 = 0;
+        this.fichasEliminadasJugador2 = 0;
     }
 
     //-------------------------------------------------------------------------------------
     // Getters y Setters
     //-------------------------------------------------------------------------------------
 
-    public Jugador getJugador1() {
-        return jugador1;
+    public String getNombreSala() {
+        return nombreSala;
     }
-
-    public Jugador getJugador2() {
-        return jugador2;
-    }
-
 
     //-------------------------------------------------------------------------------------
     // Metodos
     //-------------------------------------------------------------------------------------
 
+    public boolean ingresarFicha (Bando bando, Posicion posicion)
+    {
+        if(this.turnoDelBando == bando && this.fase == Fase.PRIMERFASE)
+        {
+            boolean variableLocal = this.tablero.ingresarFicha(bando, posicion);
+            if (variableLocal)
+            {
+                if(!this.tablero.verificarSiHayMolino())
+                {
+                    this.cambiarTurno();
+                }
+                else
+                {
+                    this.permitidoEliminarFicha = true;
+                }
+                this.turnoDeLaPartida++;
+                if(this.turnoDeLaPartida >= 18)
+                {
+                    this.fase = Fase.SEGUNDAFASE;
+                }
+            }
+            return variableLocal;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean moverFicha (Bando bando, Posicion posicionA, Posicion posicionB)
+    {
+        if(this.turnoDelBando == bando && this.fase == Fase.PRIMERFASE)
+        {
+            return this.tablero.moverFicha(bando, posicionA, posicionB);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean eliminarFichaRival (Bando bando, Posicion posicion)
+    {
+        if(this.turnoDelBando == bando && this.permitidoEliminarFicha)
+        {
+            boolean variableLocal1 = this.tablero.eliminarFichaRival(bando, posicion);
+            if (variableLocal1)
+            {
+                this.permitidoEliminarFicha = false;
+                if(bando == Bando.BLANCAS)
+                {
+                    this.fichasQueEliminaronLasBlancas++;
+                }
+                else if (bando == Bando.NEGRAS)
+                {
+                    this.fichasQueEliminaronLasNegras++;
+                }
+                if (fichasQueEliminaronLasNegras >= 7 || fichasQueEliminaronLasBlancas >= 7)
+                {
+                    // Hacer algo con el ganador
+                    this.fase = Fase.GANADOR;
+                }
+            }
+            return variableLocal1;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     @Override
-    public void agregarObservador(Observador observador) {
-        this.observadores.add(observador);
+    public boolean ingresarFicha(String posicionA, String alias)
+    {
+        Bando jugador =
+        if(jugador == bando && this.fase == Fase.PRIMERFASE)
+        {
+            boolean variableLocal = this.tablero.ingresarFicha(bando, posicion);
+            if (variableLocal)
+            {
+                if(!this.tablero.verificarSiHayMolino())
+                {
+                    this.cambiarTurno();
+                }
+                else
+                {
+                    this.permitidoEliminarFicha = true;
+                }
+                this.turnoDeLaPartida++;
+                if(this.turnoDeLaPartida >= 18)
+                {
+                    this.fase = Fase.SEGUNDAFASE;
+                }
+            }
+            return variableLocal;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     @Override
-    public void notificarObservador(Eventos evento) {
-        for (Observador observador : observadores) {
-            observador.notificar(evento);
-        }
-    }
-
-    public void InicioJuegoSinVuelo()
-    {
-        this.fase = Fase.PRIMERFASE;
-
-        notificarObservador(Eventos.COMIENZO);
-
-        //---------------------------------------------------------------------------------------------
-
-        while(this.fase == Fase.PRIMERFASE)
-        {
-            //Jugador 1
-            notificarObservador(Eventos.INGRESOFICHAJUGADOR1);
-
-
-            //Jugador2
-            notificarObservador(Eventos.INGRESOFICHAJUGADOR2);
-
-
-            //Decir cantidad de fichas restantes
-            notificarObservador(Eventos.CANTIDADFICHASRESTANTES);
-
-            if (jugador1.getCantidadDeFichas() == 0 && jugador2.getCantidadDeFichas() == 0)
-            {
-                this.fase = Fase.SEGUNDAFASE;
-            }
-        }
-
-        notificarObservador(Eventos.EMPIEZASEGUNDAFASE);
-
-        while(this.fase == Fase.SEGUNDAFASE)
-        {
-            notificarObservador(Eventos.MUEVEJUGADOR1SELECCION);
-            notificarObservador(Eventos.MUEVEJUGADOR1CASILLA);
-
-            notificarObservador(Eventos.MUEVEJUGADOR2SELECCION);
-            notificarObservador(Eventos.MUEVEJUGADOR2CASILLA);
-
-            if(jugador1.getCantidadDeFichasEliminadas() == 7)
-            {
-                notificarObservador(Eventos.GANADORJUGADOR2);
-            } else if (jugador2.getCantidadDeFichasEliminadas() == 7) {
-                notificarObservador(Eventos.GANADORJUGADOR1);
-            }
-        }
-    }
-
-    public boolean ingresoFichaJugador1(Posicion posicion)
-    {
-        if(jugador1.colocarFichaEnTablero(tablero, posicion))
-        {
-            return true;
-        }
+    public boolean moverFicha(String posicionA, String posicionB, String alias) {
         return false;
     }
 
-    public boolean verificarMolinoEnJuego(Bando bando)
-    {
-        return tablero.verificadorDeMolinos() == bando;
-    }
-
-    public boolean jugador1EliminaFichaJugador2(Posicion posicion)
-    {
-        return jugador2.ingresarFichaEliminada(tablero, posicion);
-    }
-
-    public boolean ingresoFichaJugador2(Posicion posicion)
-    {
-        if(jugador2.colocarFichaEnTablero(tablero, posicion))
-        {
-            return true;
-        }
+    @Override
+    public boolean eliminarFicha(String posicion, String alias) {
         return false;
     }
-
-    public boolean jugador2EliminaFichaJugador1(Posicion posicion)
-    {
-        return jugador1.ingresarFichaEliminada(tablero, posicion);
-    }
-
-    public boolean jugador1VerificarPosicion(Posicion posicion) {
-        if(tablero.verificarFichaDelTablero(posicion) != null)
-        {
-            return tablero.verificarFichaDelTablero(posicion).getBando() == jugador1.getBando();
-        }
-        return  false;
-    }
-
-    public boolean jugador1MueveFicha(Posicion posicionOriginal, Posicion posicion) {
-        if (tablero.moverFicha(posicionOriginal, posicion))
-        {
-            if(tablero.verificadorDeMolinos() == jugador1.getBando())
-            {
-                notificarObservador(Eventos.JUGADOR1MOLINO);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public boolean jugador2VerificarPosicion(Posicion posicion) {
-        if(tablero.verificarFichaDelTablero(posicion) != null)
-        {
-            return tablero.verificarFichaDelTablero(posicion).getBando() == jugador2.getBando();
-        }
-        return  false;
-    }
-
-    public boolean jugador2MueveFicha(Posicion posicionOriginal, Posicion posicion) {
-        if (tablero.moverFicha(posicionOriginal, posicion))
-        {
-            if(tablero.verificadorDeMolinos() == jugador2.getBando())
-            {
-                notificarObservador(Eventos.JUGADOR2MOLINO);
-            }
-            return true;
-        }
-        return false;
-    }
-
 }
+

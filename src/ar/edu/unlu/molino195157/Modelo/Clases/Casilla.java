@@ -1,5 +1,11 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 
+import ar.edu.unlu.molino195157.Modelo.Enums.Bando;
+import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Casilla
 {
     //-------------------------------------------------------------------------------------
@@ -7,7 +13,8 @@ public class Casilla
     //-------------------------------------------------------------------------------------
 
     private boolean ocupado;
-    private Ficha ficha;
+    private Bando bando;
+    private List<Posicion> listaAdyacente;
 
     //-------------------------------------------------------------------------------------
     // Constructor
@@ -22,8 +29,33 @@ public class Casilla
     // Getters y Setters
     //-------------------------------------------------------------------------------------
 
-    public Ficha getFicha() {
-        return ficha;
+    public Bando getBando()
+    {
+        return bando;
+    }
+
+    public void setListaAdyascenteAdyascente(Posicion p1, Posicion p2)
+    {
+        this.listaAdyacente = new ArrayList<>();
+        this.listaAdyacente.add(p1);
+        this.listaAdyacente.add(p2);
+    }
+
+    public void setListaAdyascenteAdyascente(Posicion p1, Posicion p2, Posicion p3)
+    {
+        this.listaAdyacente = new ArrayList<>();
+        this.listaAdyacente.add(p1);
+        this.listaAdyacente.add(p2);
+        this.listaAdyacente.add(p3);
+    }
+
+    public void setListaAdyascenteAdyascente(Posicion p1, Posicion p2, Posicion p3, Posicion p4)
+    {
+        this.listaAdyacente = new ArrayList<>();
+        this.listaAdyacente.add(p1);
+        this.listaAdyacente.add(p2);
+        this.listaAdyacente.add(p3);
+        this.listaAdyacente.add(p4);
     }
 
     //-------------------------------------------------------------------------------------
@@ -32,34 +64,22 @@ public class Casilla
 
     public boolean isOcupado()
     {
-        if (this.ocupado)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return this.ocupado;
     }
 
-    public void asignarFicha(Ficha ficha)
+    public void asignarCasillaConFicha(Bando bando)
     {
-        this.ficha = ficha;
+        this.bando = bando;
         this.ocupado = true;
     }
 
-    public Ficha eliminarFicha()
+    public void eliminarFichaDeCasilla()
     {
         this.ocupado = false;
-        Ficha ficha = this.ficha.eliminarFicha();
-        this.ficha = null;
-
-        return ficha;
+        this.bando = Bando.NINGUNO;
     }
 
-    public void sacarFicha()
-    {
-        this.ocupado = false;
-        this.ficha = null;
+    public boolean esPosicionAdyacente(Posicion posicion) {
+        return listaAdyacente.contains(posicion);
     }
 }
