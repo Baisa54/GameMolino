@@ -1,9 +1,10 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
-import ar.edu.unlu.molino195157.Modelo.Enums.Bando;
 import ar.edu.unlu.molino195157.Modelo.Enums.Fase;
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 import ar.edu.unlu.molino195157.Modelo.Interfaces.IJuego;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
+
+import java.util.Objects;
 
 public class Juego extends ObservableRemoto implements IJuego {
     //-------------------------------------------------------------------------------------
@@ -21,10 +22,10 @@ public class Juego extends ObservableRemoto implements IJuego {
     private boolean privada;
     private String contrasena;
     private int turnoDeLaPartida;
+    private String turnoDeJugador;
     private boolean eliminarFichas;
     private int fichasEliminadasJugador1;
     private int fichasEliminadasJugador2;
-
 
     //-------------------------------------------------------------------------------------
     // Constructor
@@ -42,6 +43,8 @@ public class Juego extends ObservableRemoto implements IJuego {
         this.eliminarFichas = false;
         this.fichasEliminadasJugador1 = 0;
         this.fichasEliminadasJugador2 = 0;
+
+        this.turnoDeJugador = this.jugador1.getAlias();
     }
 
     //-------------------------------------------------------------------------------------
@@ -56,101 +59,63 @@ public class Juego extends ObservableRemoto implements IJuego {
     // Metodos
     //-------------------------------------------------------------------------------------
 
-    public boolean ingresarFicha (Bando bando, Posicion posicion)
+    public boolean hayJugadorConAlias(String alias)
     {
-        if(this.turnoDelBando == bando && this.fase == Fase.PRIMERFASE)
-        {
-            boolean variableLocal = this.tablero.ingresarFicha(bando, posicion);
-            if (variableLocal)
-            {
-                if(!this.tablero.verificarSiHayMolino())
-                {
-                    this.cambiarTurno();
-                }
-                else
-                {
-                    this.permitidoEliminarFicha = true;
-                }
-                this.turnoDeLaPartida++;
-                if(this.turnoDeLaPartida >= 18)
-                {
-                    this.fase = Fase.SEGUNDAFASE;
-                }
-            }
-            return variableLocal;
+        if(this.jugador1.getAlias().equals(alias)){
+            return true;
         }
-        else
-        {
+        else if (this.jugador2.getAlias().equals(alias)){
+        return true;
+        }
+        else {
             return false;
         }
     }
 
-    public boolean moverFicha (Bando bando, Posicion posicionA, Posicion posicionB)
-    {
-        if(this.turnoDelBando == bando && this.fase == Fase.PRIMERFASE)
-        {
-            return this.tablero.moverFicha(bando, posicionA, posicionB);
+    public Jugador buscarJugador(String alias){
+        if (this.jugador1.getAlias().equals(alias)){
+            return jugador1;
         }
-        else
-        {
-            return false;
+        else{
+            return jugador2;
         }
     }
-
-    public boolean eliminarFichaRival (Bando bando, Posicion posicion)
-    {
-        if(this.turnoDelBando == bando && this.permitidoEliminarFicha)
+    public void cambiarTurno (String alias){
+        this.turnoDeLaPartida += 1;
+        if (this.jugador1.getAlias().equals(alias))
         {
-            boolean variableLocal1 = this.tablero.eliminarFichaRival(bando, posicion);
-            if (variableLocal1)
-            {
-                this.permitidoEliminarFicha = false;
-                if(bando == Bando.BLANCAS)
-                {
-                    this.fichasQueEliminaronLasBlancas++;
-                }
-                else if (bando == Bando.NEGRAS)
-                {
-                    this.fichasQueEliminaronLasNegras++;
-                }
-                if (fichasQueEliminaronLasNegras >= 7 || fichasQueEliminaronLasBlancas >= 7)
-                {
-                    // Hacer algo con el ganador
-                    this.fase = Fase.GANADOR;
-                }
-            }
-            return variableLocal1;
+           this.turnoDeJugador = this.jugador2.getAlias();
         }
-        else
-        {
-            return false;
+        else {
+            this.turnoDeJugador = this.jugador1.getAlias();
         }
     }
 
     @Override
-    public boolean ingresarFicha(String posicionA, String alias)
+    public boolean ingresarFicha(String posicion, String alias)
     {
-        Bando jugador =
-        if(jugador == bando && this.fase == Fase.PRIMERFASE)
+        if (!hayJugadorConAlias(alias)) return false;
+        Jugador jugador = buscarJugador(alias);
+
+        if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase == Fase.PRIMERA_FASE)
         {
-            boolean variableLocal = this.tablero.ingresarFicha(bando, posicion);
-            if (variableLocal)
+            boolean SePudoRealizar = this.tablero.ingresarFicha(alias, posicion);
+            if (SePudoRealizar)
             {
                 if(!this.tablero.verificarSiHayMolino())
                 {
-                    this.cambiarTurno();
+                    this.cambiarTurno(alias);
                 }
                 else
                 {
-                    this.permitidoEliminarFicha = true;
+                    this.eliminarFichas = true;
                 }
-                this.turnoDeLaPartida++;
                 if(this.turnoDeLaPartida >= 18)
                 {
-                    this.fase = Fase.SEGUNDAFASE;
+                    this.fase = Fase.SEGUNDA_FASE;
                 }
             }
-            return variableLocal;
+            return SePudoRealizar;
         }
         else
         {
@@ -160,12 +125,62 @@ public class Juego extends ObservableRemoto implements IJuego {
 
     @Override
     public boolean moverFicha(String posicionA, String posicionB, String alias) {
-        return false;
+        if (!hayJugadorConAlias(alias)) return false;
+        Jugador jugador = buscarJugador(alias);
+
+        if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase == Fase.SEGUNDA_FASE)
+        {
+            boolean SePudoRealizar = this.tablero.moverFicha(alias, posicionA, posicionB);
+            if (SePudoRealizar)
+            {
+                if(!this.tablero.verificarSiHayMolino())
+                {
+                    this.cambiarTurno(alias);
+                }
+                else
+                {
+                    this.eliminarFichas = true;
+                }
+            }
+            return SePudoRealizar;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     @Override
     public boolean eliminarFicha(String posicion, String alias) {
-        return false;
+        if (!hayJugadorConAlias(alias)) return false;
+        Jugador jugador = buscarJugador(alias);
+
+        if(jugador.getAlias().equals(this.turnoDeJugador) && this.eliminarFichas)
+        {
+            boolean variableLocal1 = this.tablero.eliminarFichaRival(alias, posicion);
+            if (variableLocal1)
+            {
+                this.eliminarFichas = false;
+                if(Objects.equals(this.jugador1.getAlias(), alias))
+                {
+                    this.fichasEliminadasJugador1 += 1;
+                }
+                else if (Objects.equals(this.jugador2.getAlias(), alias))
+                {
+                    this.fichasEliminadasJugador2 += 1;
+                }
+                if (this.fichasEliminadasJugador1 >= 7 || this.fichasEliminadasJugador2 >= 7)
+                {
+                    // Hacer algo con el ganador
+                    this.fase = Fase.FINALIZADO;
+                }
+            }
+            return variableLocal1;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 

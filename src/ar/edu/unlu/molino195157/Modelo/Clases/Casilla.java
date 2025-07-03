@@ -1,6 +1,5 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 
-import ar.edu.unlu.molino195157.Modelo.Enums.Bando;
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ public class Casilla
     //-------------------------------------------------------------------------------------
 
     private boolean ocupado;
-    private Bando bando;
+    private String bando;
     private List<Posicion> listaAdyacente;
 
     //-------------------------------------------------------------------------------------
@@ -29,9 +28,9 @@ public class Casilla
     // Getters y Setters
     //-------------------------------------------------------------------------------------
 
-    public Bando getBando()
+    public String getBando()
     {
-        return bando;
+        return this.bando;
     }
 
     public void setListaAdyascenteAdyascente(Posicion p1, Posicion p2)
@@ -67,16 +66,16 @@ public class Casilla
         return this.ocupado;
     }
 
-    public void asignarCasillaConFicha(Bando bando)
+    public void asignarCasillaConFicha(String alias)
     {
-        this.bando = bando;
+        this.bando = alias;
         this.ocupado = true;
     }
 
     public void eliminarFichaDeCasilla()
     {
         this.ocupado = false;
-        this.bando = Bando.NINGUNO;
+        this.bando = null;
     }
 
     public boolean esPosicionAdyacente(Posicion posicion) {

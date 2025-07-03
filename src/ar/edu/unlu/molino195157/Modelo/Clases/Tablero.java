@@ -1,19 +1,23 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 
-import ar.edu.unlu.molino195157.Modelo.Enums.Bando;
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
-public class Tablero
-{
+public class Tablero {
     //-------------------------------------------------------------------------------------
     // Atributos
     //-------------------------------------------------------------------------------------
 
+    // atributos de clase
+    private TransformadorDePosiciones tdp;
+
+    // atributos propios
     private HashMap<Posicion, Casilla> Casillas;
     private List<CombinacionDeMolino> molinos;
+
 
     //-------------------------------------------------------------------------------------
     // Constructor
@@ -23,6 +27,7 @@ public class Tablero
     {
         this.Casillas = new HashMap<>();
         this.molinos = new ArrayList<>();
+        this.tdp = new TransformadorDePosiciones();
 
         // Llenar el HashMap con objetos Casilla, su clave sera Posicion.
 
@@ -97,12 +102,20 @@ public class Tablero
         return Casillas.get(posicion);
     }
 
-    public Boolean ingresarFicha (Bando bando, Posicion posicion)
+    public Boolean ingresarFicha (String alias, String posicion)
     {
-        if (!obtenerCasilla(posicion).isOcupado())
+        Posicion posicionVariableLocal = this.tdp.stringToPosicion(posicion);
+        if (posicionVariableLocal == Posicion.POSICION_NULA) return false;
+
+        if (!obtenerCasilla(posicionVariableLocal).isOcupado())
         {
-            obtenerCasilla(posicion).asignarCasillaConFicha(bando);
-            return true;
+            if(!obtenerCasilla(posicionVariableLocal).isOcupado()) {
+                obtenerCasilla(posicionVariableLocal).asignarCasillaConFicha(alias);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
         else
         {
@@ -110,14 +123,20 @@ public class Tablero
         }
     }
 
-    public Boolean moverFicha (Bando bando, Posicion posicionA, Posicion posicionB)
+    public Boolean moverFicha (String alias, String posicionA, String posicionB)
     {
-        if (obtenerCasilla(posicionA).isOcupado() && !obtenerCasilla(posicionB).isOcupado() && obtenerCasilla(posicionA).esPosicionAdyacente(posicionB))
+        Posicion posicionVariableLocalA = this.tdp.stringToPosicion(posicionA);
+        Posicion posicionVariableLocalB = this.tdp.stringToPosicion(posicionB);
+
+        if (posicionVariableLocalA == Posicion.POSICION_NULA) return false;
+        if (posicionVariableLocalB == Posicion.POSICION_NULA) return false;
+
+        if (obtenerCasilla(posicionVariableLocalA).isOcupado() && !obtenerCasilla(posicionVariableLocalB).isOcupado() && obtenerCasilla(posicionVariableLocalA).esPosicionAdyacente(posicionVariableLocalB))
         {
-            if (obtenerCasilla(posicionA).getBando() == bando)
+            if (Objects.equals(obtenerCasilla(posicionVariableLocalA).getBando(), alias))
             {
-                obtenerCasilla(posicionB).asignarCasillaConFicha(obtenerCasilla(posicionA).getBando());
-                obtenerCasilla(posicionA).eliminarFichaDeCasilla();
+                obtenerCasilla(posicionVariableLocalB).asignarCasillaConFicha(obtenerCasilla(posicionVariableLocalA).getBando());
+                obtenerCasilla(posicionVariableLocalA).eliminarFichaDeCasilla();
                 return true;
             }
             else
@@ -131,11 +150,14 @@ public class Tablero
         }
     }
 
-    public Boolean eliminarFichaRival (Bando bando, Posicion posicion)
+    public Boolean eliminarFichaRival (String alias, String posicion)
     {
-        if (obtenerCasilla(posicion).isOcupado() && obtenerCasilla(posicion).getBando() != bando)
+        Posicion posicionVariableLocal = this.tdp.stringToPosicion(posicion);
+        if (posicionVariableLocal == Posicion.POSICION_NULA) return false;
+
+        if (obtenerCasilla(posicionVariableLocal).isOcupado() && !Objects.equals(obtenerCasilla(posicionVariableLocal).getBando(), alias))
         {
-            obtenerCasilla(posicion).eliminarFichaDeCasilla();
+            obtenerCasilla(posicionVariableLocal).eliminarFichaDeCasilla();
             return true;
         }
         else
@@ -144,7 +166,7 @@ public class Tablero
         }
     }
 
-    public boolean verificarSiHayMolino ()
+    public boolean verificarSiHayMolino()
     {
         for (CombinacionDeMolino molino : molinos)
         {
