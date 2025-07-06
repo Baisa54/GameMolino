@@ -4,6 +4,8 @@ import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 import ar.edu.unlu.molino195157.Modelo.Interfaces.IJuego;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Juego extends ObservableRemoto implements IJuego {
@@ -55,9 +57,26 @@ public class Juego extends ObservableRemoto implements IJuego {
         return nombreSala;
     }
 
+    public boolean isPrivada() {
+        return privada;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public Jugador getJugador2() {
+        return jugador2;
+    }
+
     //-------------------------------------------------------------------------------------
     // Metodos
     //-------------------------------------------------------------------------------------
+
+    public void anadirJugador(Jugador jugador){
+        this.jugador2 = jugador;
+        this.fase = Fase.PRIMERA_FASE;
+    }
 
     public boolean hayJugadorConAlias(String alias)
     {
@@ -174,6 +193,7 @@ public class Juego extends ObservableRemoto implements IJuego {
                     // Hacer algo con el ganador
                     this.fase = Fase.FINALIZADO;
                 }
+                this.cambiarTurno(alias);
             }
             return variableLocal1;
         }

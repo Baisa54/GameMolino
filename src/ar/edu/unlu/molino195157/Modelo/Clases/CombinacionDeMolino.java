@@ -45,9 +45,4 @@ public class CombinacionDeMolino {
         return false;
     }
 
-    public Bando isMolinoBando()
-    {
-        return p1.getBando();
-    }
-
 }
