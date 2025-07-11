@@ -1,9 +1,11 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
+import ar.edu.unlu.molino195157.Modelo.Enums.Eventos;
 import ar.edu.unlu.molino195157.Modelo.Enums.Fase;
-import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 import ar.edu.unlu.molino195157.Modelo.Interfaces.IJuego;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 
+import java.awt.*;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -13,107 +15,153 @@ public class Juego extends ObservableRemoto implements IJuego {
     // Atributos
     //-------------------------------------------------------------------------------------
 
-    //Atributos Clase
+    //atributos administrativos
+    private List<Jugador> jugadores;
+
+    //Atributos Clase Juego
     private Jugador jugador1;
     private Jugador jugador2;
     private Tablero tablero;
     private Fase fase;
+    private String aliasGanador;
 
     //Atributos Propios
-    private String nombreSala;
-    private boolean privada;
-    private String contrasena;
     private int turnoDeLaPartida;
     private String turnoDeJugador;
     private boolean eliminarFichas;
     private int fichasEliminadasJugador1;
     private int fichasEliminadasJugador2;
 
+    //Atributos para control de juego
+    private String[] ultimoMovimientoPosiciones;
+    private String ultimoJugador;
+    private String ultimaCasilla;
+
+    //-------------------------------------------------------------------------------------
+    // getInstancia
+    //-------------------------------------------------------------------------------------
+
     //-------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------
 
-    public Juego(String nombreSala, String contrasena, boolean privada, Jugador jugador1)
+    public Juego()
     {
-        this.contrasena = contrasena;
         this.fase = Fase.SIN_COMENZAR;
-        this.jugador1 = jugador1;
-        this.nombreSala = nombreSala;
-        this.privada = privada;
         this.tablero = new Tablero();
         this.turnoDeLaPartida = 1;
         this.eliminarFichas = false;
         this.fichasEliminadasJugador1 = 0;
         this.fichasEliminadasJugador2 = 0;
-
-        this.turnoDeJugador = this.jugador1.getAlias();
+        this.jugadores = new ArrayList<>();
     }
 
     //-------------------------------------------------------------------------------------
     // Getters y Setters
     //-------------------------------------------------------------------------------------
 
-    public String getNombreSala() {
-        return nombreSala;
+    public void setJugador1(Jugador jugador1) {
+        this.jugador1 = jugador1;
     }
 
-    public boolean isPrivada() {
-        return privada;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public Jugador getJugador2() {
-        return jugador2;
+    public void setJugador2(Jugador jugador2) {
+        this.jugador2 = jugador2;
     }
 
     //-------------------------------------------------------------------------------------
-    // Metodos
+    // Metodos de clase
     //-------------------------------------------------------------------------------------
-
-    public void anadirJugador(Jugador jugador){
-        this.jugador2 = jugador;
-        this.fase = Fase.PRIMERA_FASE;
-    }
-
-    public boolean hayJugadorConAlias(String alias)
-    {
-        if(this.jugador1.getAlias().equals(alias)){
-            return true;
-        }
-        else if (this.jugador2.getAlias().equals(alias)){
-        return true;
-        }
-        else {
-            return false;
-        }
-    }
 
     public Jugador buscarJugador(String alias){
-        if (this.jugador1.getAlias().equals(alias)){
-            return jugador1;
+        for (Jugador jugador : jugadores) {
+            if (jugador.getAlias().equalsIgnoreCase(alias)) {
+                return jugador;
+            }
         }
-        else{
-            return jugador2;
-        }
+        return null;
     }
-    public void cambiarTurno (String alias){
+
+    public void cambiarTurno (String alias) throws RemoteException {
         this.turnoDeLaPartida += 1;
         if (this.jugador1.getAlias().equals(alias))
         {
            this.turnoDeJugador = this.jugador2.getAlias();
+            notificarObservadores(Eventos.CAMBIOTURNO);
         }
         else {
             this.turnoDeJugador = this.jugador1.getAlias();
+            notificarObservadores(Eventos.CAMBIOTURNO);
+        }
+    }
+
+    private boolean aliasEsValido(String alias) {
+        return (jugador1 != null && jugador1.getAlias().equalsIgnoreCase(alias)) ||
+                (jugador2 != null && jugador2.getAlias().equalsIgnoreCase(alias));
+    }
+
+    //-------------------------------------------------------------------------------------
+    // Metodos Administrativos
+    //-------------------------------------------------------------------------------------
+
+    @Override
+    public boolean jugadorBlancas(String alias) throws RemoteException {
+        if (jugador1 == null) {
+            jugador1 = buscarJugador(alias);
+            if (jugador1 != null) {
+                arrancaJuego();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean jugadorNegras(String alias) throws RemoteException {
+        if (jugador2 == null) {
+            jugador2 = buscarJugador(alias);
+            if (jugador2 != null) {
+                arrancaJuego();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void arrancaJuego() throws RemoteException {
+        if (jugador1 != null && jugador2 != null) {
+            this.fase = Fase.PRIMERA_FASE;
+            notificarObservadores(Eventos.COMIENZO);
         }
     }
 
     @Override
-    public boolean ingresarFicha(String posicion, String alias)
-    {
-        if (!hayJugadorConAlias(alias)) return false;
+    public boolean registrarNuevoJugador(String alias, String contrasena) throws RemoteException {
+        for (Jugador jugador : jugadores) {
+            if (jugador.getAlias().equalsIgnoreCase(alias)) {
+                return false;
+            }
+        }
+        jugadores.add(new Jugador(alias, contrasena));
+        return true;
+    }
+
+    @Override
+    public boolean iniciarSesion(String alias, String contrasena) throws RemoteException {
+        for (Jugador jugador : jugadores) {
+            if (jugador.iniciarSesion(alias, contrasena)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //-------------------------------------------------------------------------------------
+    // Metodos de Juego
+    //-------------------------------------------------------------------------------------
+
+    @Override
+    public boolean ingresarFicha(String posicion, String alias) throws RemoteException {
+        if (!aliasEsValido(alias)) return false;
         Jugador jugador = buscarJugador(alias);
 
         if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase == Fase.PRIMERA_FASE)
@@ -121,6 +169,9 @@ public class Juego extends ObservableRemoto implements IJuego {
             boolean SePudoRealizar = this.tablero.ingresarFicha(alias, posicion);
             if (SePudoRealizar)
             {
+                this.ultimaCasilla = posicion;
+                this.ultimoJugador = alias;
+                notificarObservadores(Eventos.INGRESOFICHA);
                 if(!this.tablero.verificarSiHayMolino())
                 {
                     this.cambiarTurno(alias);
@@ -128,11 +179,14 @@ public class Juego extends ObservableRemoto implements IJuego {
                 else
                 {
                     this.eliminarFichas = true;
+                    notificarObservadores(Eventos.MOLINO);
                 }
                 if(this.turnoDeLaPartida >= 18)
                 {
                     this.fase = Fase.SEGUNDA_FASE;
+                    notificarObservadores(Eventos.SEGUNDAFASE);
                 }
+
             }
             return SePudoRealizar;
         }
@@ -143,8 +197,8 @@ public class Juego extends ObservableRemoto implements IJuego {
     }
 
     @Override
-    public boolean moverFicha(String posicionA, String posicionB, String alias) {
-        if (!hayJugadorConAlias(alias)) return false;
+    public boolean moverFicha(String posicionA, String posicionB, String alias) throws RemoteException {
+        if (!aliasEsValido(alias)) return false;
         Jugador jugador = buscarJugador(alias);
 
         if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase == Fase.SEGUNDA_FASE)
@@ -152,6 +206,8 @@ public class Juego extends ObservableRemoto implements IJuego {
             boolean SePudoRealizar = this.tablero.moverFicha(alias, posicionA, posicionB);
             if (SePudoRealizar)
             {
+                this.ultimoMovimientoPosiciones = new String[] {posicionA, posicionB};
+                notificarObservadores(Eventos.MUEVEFICHA);
                 if(!this.tablero.verificarSiHayMolino())
                 {
                     this.cambiarTurno(alias);
@@ -159,6 +215,7 @@ public class Juego extends ObservableRemoto implements IJuego {
                 else
                 {
                     this.eliminarFichas = true;
+                    notificarObservadores(Eventos.MOLINO);
                 }
             }
             return SePudoRealizar;
@@ -170,8 +227,8 @@ public class Juego extends ObservableRemoto implements IJuego {
     }
 
     @Override
-    public boolean eliminarFicha(String posicion, String alias) {
-        if (!hayJugadorConAlias(alias)) return false;
+    public boolean eliminarFicha(String posicion, String alias) throws RemoteException {
+        if (!aliasEsValido(alias)) return false;
         Jugador jugador = buscarJugador(alias);
 
         if(jugador.getAlias().equals(this.turnoDeJugador) && this.eliminarFichas)
@@ -180,6 +237,9 @@ public class Juego extends ObservableRemoto implements IJuego {
             if (variableLocal1)
             {
                 this.eliminarFichas = false;
+                this.ultimaCasilla = posicion;
+                this.ultimoJugador = alias;
+                notificarObservadores(Eventos.FICHAELIMINADA);
                 if(Objects.equals(this.jugador1.getAlias(), alias))
                 {
                     this.fichasEliminadasJugador1 += 1;
@@ -190,7 +250,8 @@ public class Juego extends ObservableRemoto implements IJuego {
                 }
                 if (this.fichasEliminadasJugador1 >= 7 || this.fichasEliminadasJugador2 >= 7)
                 {
-                    // Hacer algo con el ganador
+                    this.aliasGanador = alias;
+                    notificarObservadores(Eventos.GANADOR);
                     this.fase = Fase.FINALIZADO;
                 }
                 this.cambiarTurno(alias);
@@ -202,5 +263,39 @@ public class Juego extends ObservableRemoto implements IJuego {
             return false;
         }
     }
+
+    @Override
+    public String consultarUltimaCasilla() throws RemoteException {
+        return this.ultimaCasilla;
+    }
+
+    @Override
+    public String consultarUltimoJugador() throws RemoteException {
+        return this.ultimoJugador;
+    }
+
+    @Override
+    public String[] consultarUltimoMovimiento() throws RemoteException {
+        return this.ultimoMovimientoPosiciones;
+    }
+
+    @Override
+    public Color consultarColor(String alias) throws RemoteException{
+        if (jugador1 != null && alias.equals(jugador1.getAlias())) {
+            return Color.WHITE;
+        } else if (jugador2 != null && alias.equals(jugador2.getAlias())) {
+            return Color.BLACK;
+        }
+        return null;
+    }
+
+    @Override
+    public String consultarGanador() throws RemoteException {return this.aliasGanador;}
+
+    @Override
+    public String getTurnoDeJugador() throws RemoteException {
+        return this.turnoDeJugador;
+    }
 }
+
 

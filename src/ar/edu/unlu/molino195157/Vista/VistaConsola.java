@@ -1,88 +1,238 @@
 package ar.edu.unlu.molino195157.Vista;
 
 import ar.edu.unlu.molino195157.Controlador.Controlador;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class VistaConsola extends JFrame {
-        private JPanel panelPrincipal;
-        private JPanel panelTablero;
-        private JTextArea txtSalida;
-        private JTextField txtEntrada;
-        private JButton btnEnter;
-        private Controlador controlador;
+public class VistaConsola extends JFrame implements IVista {
+    private JPanel panelPrincipal;
+    private JPanel panelTablero;
+    private JTextArea txtSalida;
+    private JTextField txtEntrada;
+    private JButton btnEnter;
+    private Controlador controlador;
+    private Map<String, JButton> botonesPorPosicion = new HashMap<>();
 
-        public VistaConsola(Controlador controlador) {
-            setTitle("Molino - Consola Visual");
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(800, 600);
-            setLocationRelativeTo(null);
+    public VistaConsola(Controlador controlador) {
+        setTitle("Molino - Consola Visual");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(900, 600);
+        setLocationRelativeTo(null);
 
-            this.controlador = controlador;
+        this.controlador = controlador;
 
-            // Panel principal con GridBagLayout
-            panelPrincipal = new JPanel(new GridBagLayout());
-            GridBagConstraints c = new GridBagConstraints();
+        // PANEL PRINCIPAL HORIZONTAL: tablero izquierda, consola derecha
+        panelPrincipal = new JPanel(new BorderLayout());
 
-            // Panel del tablero (izquierda arriba)
-            panelTablero = new JPanel(new GridLayout(7, 7)); // por ejemplo
-            inicializarTablero();
-            c.gridx = 0;
-            c.gridy = 0;
-            c.weightx = 0.5;
-            c.weighty = 0.7;
-            c.fill = GridBagConstraints.BOTH;
-            panelPrincipal.add(panelTablero, c);
+        // PANEL IZQUIERDO: tablero
+        panelTablero = new JPanel(new GridLayout(7, 7));
+        panelTablero.setPreferredSize(new Dimension(450, 450)); // Tamaño fijo tablero
+        inicializarTablero();
+        panelPrincipal.add(panelTablero, BorderLayout.WEST);
 
-            // Área de texto (derecha arriba)
-            txtSalida = new JTextArea();
-            txtSalida.setEditable(false);
-            JScrollPane scrollPane = new JScrollPane(txtSalida);
-            c.gridx = 1;
-            c.gridy = 0;
-            c.weightx = 0.5;
-            c.weighty = 0.7;
-            panelPrincipal.add(scrollPane, c);
+        // PANEL DERECHO: consola y entrada abajo
+        JPanel panelDerecho = new JPanel(new BorderLayout());
 
-            // Campo de entrada (izquierda abajo)
-            txtEntrada = new JTextField();
-            txtEntrada.setFont(new Font("Arial", Font.PLAIN, 18)); // más grande
-            c.gridx = 0;
-            c.gridy = 1;
-            c.weightx = 0.8;
-            c.weighty = 0.3;
-            c.fill = GridBagConstraints.BOTH;
-            panelPrincipal.add(txtEntrada, c);
+        // CONSOLA DE TEXTO (CENTRO)
+        txtSalida = new JTextArea();
+        txtSalida.setEditable(false);
+        txtSalida.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        JScrollPane scrollPane = new JScrollPane(txtSalida);
+        panelDerecho.add(scrollPane, BorderLayout.CENTER);
 
-            // Botón enviar (derecha abajo)
-            btnEnter = new JButton("Enviar");
-            btnEnter.setFont(new Font("Arial", Font.BOLD, 16)); // texto más grande
-            c.gridx = 1;
-            c.gridy = 1;
-            c.weightx = 0.2;
-            c.fill = GridBagConstraints.BOTH;
-            panelPrincipal.add(btnEnter, c);
+        // PANEL INFERIOR: entrada de texto + botón
+        JPanel panelEntrada = new JPanel(new BorderLayout());
+        txtEntrada = new JTextField();
+        txtEntrada.setFont(new Font("Arial", Font.PLAIN, 16));
+        btnEnter = new JButton("Enviar");
+        btnEnter.setFont(new Font("Arial", Font.BOLD, 16));
+
+        panelEntrada.add(txtEntrada, BorderLayout.CENTER);
+        panelEntrada.add(btnEnter, BorderLayout.EAST);
+        panelEntrada.setPreferredSize(new Dimension(400, 50));
+
+        panelDerecho.add(panelEntrada, BorderLayout.SOUTH);
+
+        // Añadir panel derecho al principal
+        panelPrincipal.add(panelDerecho, BorderLayout.CENTER);
+
+        setContentPane(panelPrincipal);
+
+        // Acción del botón
+        btnEnter.addActionListener(e -> {
+            procesarEntrada(txtEntrada.getText());
+            txtEntrada.setText("");
+        });
+    }
+
+    public void inicializarTablero() {
+        panelTablero.removeAll();
+        panelTablero.setLayout(new GridLayout(7, 7));
+        panelTablero.setBackground(Color.LIGHT_GRAY); // o LIGHT_GRAY si querés
+
+        String[][] diseño = {
+                {"A1", "—", "—", "D1", "—", "—", "G1"},
+                {"|", "B2", "—", "D2", "—", "F2", "|"},
+                {"|", "|", "C3", "D3", "E3", "|", "|"},
+                {"A4", "B4", "C4", "", "E4", "F4", "G4"},
+                {"|", "|", "C5", "D5", "E5", "|", "|"},
+                {"|", "B6", "—", "D6", "—", "F6", "|"},
+                {"A7", "—", "—", "D7", "—", "—", "G7"}
+        };
+
+        Font fuente = new Font("Arial", Font.BOLD, 18);
+        botonesPorPosicion.clear(); // Limpia por si se reinicia
+
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 7; j++) {
+                String celda = diseño[i][j];
+
+                switch (celda) {
+                    case "—" -> panelTablero.add(new PanelLinea(true, false));
+                    case "|" -> panelTablero.add(new PanelLinea(false, true));
+                    case "" -> panelTablero.add(new JPanel()); // celda vacía
+                    default -> {
+                        JButton boton = new JButton(celda);
+                        boton.setFocusable(false); // no recibe foco
+                        boton.setRequestFocusEnabled(false); // no permite que el foco lo seleccione
+                        boton.setContentAreaFilled(false); // evita el relleno celeste por defecto
+                        boton.setOpaque(true); // pero seguimos permitiendo fondo sólido
+                        boton.setBackground(Color.GRAY); // fondo gris
+                        boton.setForeground(new Color(0x0077FF)); // texto azul
+                        boton.setBorderPainted(false); // sin borde
+                        boton.setFocusPainted(false); // sin borde azul de selección
 
 
-            setContentPane(panelPrincipal);
+                        panelTablero.add(boton);
+                        botonesPorPosicion.put(celda, boton);
 
-            btnEnter.addActionListener(e -> {
-                //procesarEntrada(txtEntrada.getText());
-                txtEntrada.setText("");
-            });
 
-        }
-
-        public void inicializarTablero() {
-            for (int i = 0; i < 49; i++) { // 7x7
-                JButton btn = new JButton();
-                btn.setEnabled(false); // no clickeables
-                panelTablero.add(btn);
-                setVisible(true);
+                        panelTablero.add(boton);
+                        botonesPorPosicion.put(celda, boton);
+                    }
+                }
             }
         }
 
-        // Resto del código igual que ya tenés...
+        panelTablero.revalidate();
+        panelTablero.repaint();
     }
+
+    private void procesarEntrada(String comando) {
+        String[] partes = comando.trim().split(" ");
+        if (partes.length == 0) return;
+
+        switch (partes[0].toLowerCase()) {
+            case "registrarse" -> {
+                if (partes.length == 3) {
+                    controlador.registrarse(partes[1], partes[2]);
+                } else {
+                    mostrarMensaje("Uso: registrarse <alias> <contraseña>");
+                }
+            }
+            case "iniciarsesion" -> {
+                if (partes.length == 3) {
+                    controlador.iniciarSesion(partes[1], partes[2]);
+                } else {
+                    mostrarMensaje("Uso: iniciarSesion <alias> <contraseña>");
+                }
+            }
+            case "ingresar" -> {
+                if (partes.length == 2) {
+                    controlador.ingresarFicha(partes[1]);
+                } else {
+                    mostrarMensaje("Uso: ingresar <posicion>");
+                }
+            }
+            case "mover" -> {
+                if (partes.length == 3) {
+                    controlador.moverFicha(partes[1], partes[2]);
+                } else {
+                    mostrarMensaje("Uso: mover <desde> <hasta>");
+                }
+            }
+            case "eliminar" -> {
+                if (partes.length == 2) {
+                    controlador.eliminarFicha(partes[1]);
+                } else {
+                    mostrarMensaje("Uso: eliminar <posicion>");
+                }
+            }
+            case "unirseblancas" -> {
+                controlador.unirseAJuegoBlancas();
+            }
+            case "unirsenegras" -> {
+                controlador.unirseAJuegoNegras();
+            }
+            case "help" -> {
+                mostrarMensaje("""
+                        Comandos disponibles:
+                        • registrarse <alias> <contraseña>    - Crea un nuevo usuario
+                        • iniciarSesion <alias> <contraseña>  - Inicia sesión con un alias
+                        • ingresar <posicion>                 - Coloca una ficha en el tablero
+                        • mover <desde> <hasta>               - Mueve una ficha del jugador
+                        • eliminar <posicion>                 - Elimina una ficha del rival
+                        • unirseBlancas                       - Se une al juego como jugador blanco
+                        • unirseNegras                        - Se une al juego como jugador negro
+                        • help                                - Muestra este mensaje
+                        """);
+            }
+            default -> mostrarMensaje("Comando no reconocido.");
+        }
+    }
+
+    @Override
+    public void setControlador(Controlador controlador) {
+        this.controlador = controlador;
+    }
+
+    @Override
+    public void iniciar() {
+        setVisible(true);
+    }
+
+    @Override
+    public void mostrarFichaIngresada(String posicion, Color color) {
+        JButton boton = botonesPorPosicion.get(posicion);
+        if (boton != null) {
+            boton.setBackground(color);
+        }
+    }
+
+    @Override
+    public void mostrarFichaMovida(String desde, String hasta, Color color) {
+        JButton botonDesde = botonesPorPosicion.get(desde);
+        JButton botonHasta = botonesPorPosicion.get(hasta);
+
+        if (botonDesde != null && botonHasta != null) {
+            botonDesde.setText(desde); // Restaurar etiqueta original
+            botonDesde.setBackground(Color.LIGHT_GRAY); // Color por defecto del tablero
+
+            botonHasta.setBackground(color);
+        } else {
+            mostrarMensaje("Error al mover ficha");
+        }
+    }
+
+
+    @Override
+    public void mostrarFichaEliminada(String posicion) {
+        JButton boton = botonesPorPosicion.get(posicion);
+        if (boton != null) {
+            boton.setText(posicion);
+            boton.setBackground(Color.LIGHT_GRAY);
+        }
+    }
+
+    @Override
+    public void mostrarMensaje(String mensaje) {
+        txtSalida.append(mensaje + "\n");
+        txtSalida.setCaretPosition(txtSalida.getDocument().getLength());
+    }
+
+}
+
 
