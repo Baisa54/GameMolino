@@ -1,6 +1,8 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 
-public class Jugador {
+import java.io.Serializable;
+
+public class Jugador implements Serializable {
     //-------------------------------------------------------------------------------------
     // Atributos
     //-------------------------------------------------------------------------------------
@@ -8,6 +10,7 @@ public class Jugador {
     // atributos propios
     private String alias;
     private String contrasena;
+    private int partidasGanadas;
 
     //-------------------------------------------------------------------------------------
     // Constructor
@@ -22,13 +25,12 @@ public class Jugador {
     // Getters y Setters
     //-------------------------------------------------------------------------------------
 
-
     public String getAlias() {
         return alias;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public int getPartidasGanadas() {
+        return partidasGanadas;
     }
 
     //-------------------------------------------------------------------------------------
@@ -39,4 +41,6 @@ public class Jugador {
     {
         return this.alias.equals(alias) && this.contrasena.equals(contrasena);
     }
+
+    public void sumarVictoria(){this.partidasGanadas += 1;}
 }

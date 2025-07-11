@@ -2,10 +2,11 @@ package ar.edu.unlu.molino195157.Modelo.Clases;
 
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Casilla
+public class Casilla implements Serializable
 {
     //-------------------------------------------------------------------------------------
     // Atributos

@@ -1,11 +1,12 @@
 package ar.edu.unlu.molino195157.Modelo.Interfaces;
 
 import ar.edu.unlu.molino195157.Modelo.Clases.Juego;
+import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 
 import java.awt.*;
 import java.rmi.RemoteException;
 
-public interface IJuego {
+public interface IJuego extends IObservableRemoto {
 
     //-------------------------------------------------------------------------------------
     // Administrativos
@@ -44,4 +45,10 @@ public interface IJuego {
     public String consultarGanador() throws RemoteException;
 
     public String getTurnoDeJugador() throws RemoteException;
+
+    public void reiniciar() throws RemoteException;
+
+    public String[] listarTop5() throws RemoteException;
+
+    public void rendirse (String alias) throws  RemoteException;
 }

@@ -2,7 +2,9 @@ package ar.edu.unlu.molino195157.Modelo.Clases;
 
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
 
-public class TransformadorDePosiciones {
+import java.io.Serializable;
+
+public class TransformadorDePosiciones implements Serializable {
     //-------------------------------------------------------------------------------------
     // Metodos
     //-------------------------------------------------------------------------------------

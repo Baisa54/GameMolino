@@ -1,11 +1,11 @@
-package ar.edu.unlu.molino195157.appMain;
+package ar.edu.unlu.molino195157;
 import ar.edu.unlu.molino195157.Modelo.Clases.Juego;
-import ar.edu.unlu.molino195157.Modelo.Interfaces.IJuego;
 import ar.edu.unlu.rmimvc.RMIMVCException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import ar.edu.unlu.rmimvc.RMIMVCException;
+import ar.edu.unlu.molino195157.Modelo.Persistencia.Serializador;
+
 import ar.edu.unlu.rmimvc.Util;
 import ar.edu.unlu.rmimvc.servidor.Servidor;
 
@@ -29,17 +29,29 @@ public class AppServidor {
                 null,
                 8888
         );
-        Juego juego = new Juego();
+
+        Serializador serializador = new Serializador("juego.dat");
+        Juego juegoRecuperado = (Juego) serializador.readFirstObject();
+        if (juegoRecuperado != null) {
+            Juego.setInstancia(juegoRecuperado);
+            System.out.println("Juego cargado desde archivo.");
+        } else {
+            Juego.getInstancia();
+            System.out.println("No se encontró archivo, se creó un nuevo juego.");
+        }
+
+        Juego juego = Juego.getInstancia();
+
         Servidor servidor = new Servidor(ip, Integer.parseInt(port));
         try {
             servidor.iniciar(juego);
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RMIMVCException e) {
-            // TODO Auto-generated catch block
+        } catch (RemoteException | RMIMVCException e) {
             e.printStackTrace();
         }
-    }
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            serializador.writeOneObject(Juego.getInstancia());
+            System.out.println("Juego guardado automáticamente al cerrar.");
+        }));
+    }
 }

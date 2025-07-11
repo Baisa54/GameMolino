@@ -1,4 +1,4 @@
-package ar.edu.unlu.molino195157.appMain;
+package ar.edu.unlu.molino195157;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.Util;
 import ar.edu.unlu.rmimvc.cliente.Cliente;
 
-public class AppVistaGrafica {
+public class AppVistaConsola {
     public static void main(String[] args) {
         ArrayList<String> ips = Util.getIpDisponibles();
         String ip = (String) JOptionPane.showInputDialog(
@@ -46,13 +46,14 @@ public class AppVistaGrafica {
                 null,
                 8888
         );
-        Controlador controlador = new Controlador();
-        IVista vista = new VistaConsola(controlador);
-        controlador.setVista(vista);
+        IVista vista = new VistaConsola();
+        Controlador controlador = new Controlador(vista);
+        vista.setControlador(controlador);
         Cliente c = new Cliente(ip, Integer.parseInt(port), ipServidor, Integer.parseInt(portServidor));
-        vista.iniciar();
         try {
             c.iniciar(controlador);
+            vista.iniciar();
+            vista.mostrarMensaje("escriba help para saber los comandos");
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

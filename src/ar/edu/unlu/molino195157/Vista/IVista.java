@@ -16,4 +16,5 @@ public interface IVista {
     public void mostrarFichaMovida(String desde, String hasta, Color color);
     public void mostrarFichaEliminada(String posicion);
     public void mostrarMensaje(String mensaje);
+    public void reiniciarTablero();
 }

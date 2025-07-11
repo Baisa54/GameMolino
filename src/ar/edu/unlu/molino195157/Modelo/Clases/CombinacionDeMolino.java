@@ -1,6 +1,8 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 
-public class CombinacionDeMolino {
+import java.io.Serializable;
+
+public class CombinacionDeMolino implements Serializable {
 
     //-------------------------------------------------------------------------------------
     // Atributos
@@ -44,5 +46,18 @@ public class CombinacionDeMolino {
         }
         return false;
     }
+
+    public void actualizarEstado() {
+        if (p1.isOcupado() && p2.isOcupado() && p3.isOcupado()) {
+            if (p1.getBando().equals(p2.getBando()) && p2.getBando().equals(p3.getBando())) {
+                this.combinacionMolinoOcupada = true;
+            } else {
+                this.combinacionMolinoOcupada = false;
+            }
+        } else {
+            this.combinacionMolinoOcupada = false;
+        }
+    }
+
 
 }

@@ -28,7 +28,9 @@ public class Controlador implements IControladorRemoto
     // Constructor
     //-------------------------------------------------------------------------------------
 
-    // default
+    public Controlador(IVista vista) {
+        this.vista = vista;
+    }
 
     //-------------------------------------------------------------------------------------
     // Getters y Setters
@@ -45,25 +47,26 @@ public class Controlador implements IControladorRemoto
     public void unirseAJuegoBlancas(){
         boolean variableLocal = false;
         try {
+            System.out.println(this.miAlias);
             variableLocal = juego.jugadorBlancas(this.miAlias);
+            if(variableLocal){
+                vista.mostrarMensaje("Se ha entrado correctamente al juego con Blancas");}
+            else {vista.mostrarMensaje("no se pudo unir");}
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-        if(variableLocal){
-            vista.mostrarMensaje("Se ha entrado correctamente al juego con Blancas");}
-        else {vista.mostrarMensaje("no se pudo unir");}
     }
 
     public void unirseAJuegoNegras(){
         boolean variableLocal = false;
         try {
             variableLocal = juego.jugadorNegras(this.miAlias);
+            if(variableLocal){
+                vista.mostrarMensaje("Se ha entrado correctamente al juego con Negras");}
+            else {vista.mostrarMensaje("no se pudo unir");}
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-        if(variableLocal){
-            vista.mostrarMensaje("Se ha entrado correctamente al juego con Negras");}
-        else {vista.mostrarMensaje("no se pudo unir");}
     }
 
     public void registrarse(String alias, String contrasena)
@@ -71,13 +74,13 @@ public class Controlador implements IControladorRemoto
         boolean variableLocal = false;
         try {
             variableLocal = juego.registrarNuevoJugador(alias, contrasena);
+            if(variableLocal){
+                this.miAlias = alias;
+                vista.mostrarMensaje("se ha registrado correctamente el usuario " + alias);}
+            else {vista.mostrarMensaje("no se pudo registrar correctamente, pruebe cambiando miAlias");}
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-        if(variableLocal){
-            this.miAlias = alias;
-            vista.mostrarMensaje("se ha registrado correctamente el usuario " + alias);}
-        else {vista.mostrarMensaje("no se pudo registrar correctamente, pruebe cambiando miAlias");}
     }
 
     public void iniciarSesion(String alias, String contrasena)
@@ -85,15 +88,15 @@ public class Controlador implements IControladorRemoto
         boolean variableLocal = false;
         try {
             variableLocal = juego.iniciarSesion(alias, contrasena);
+            if(variableLocal){
+                this.miAlias = alias;
+                vista.mostrarMensaje("se ha iniciado sesion correctamente, usuario " + alias);
+            }
+            else {
+                vista.mostrarMensaje("no se pudo iniciar sesion correctamente, pruebe cambiando miAlias o contrasena");
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
-        }
-        if(variableLocal){
-            this.miAlias = alias;
-            vista.mostrarMensaje("se ha iniciado sesion correctamente, usuario " + alias);
-        }
-        else {
-            vista.mostrarMensaje("no se pudo iniciar sesion correctamente, pruebe cambiando miAlias o contrasena");
         }
     }
 
@@ -102,11 +105,11 @@ public class Controlador implements IControladorRemoto
         boolean variableLocal = false;
         try {
             variableLocal = juego.ingresarFicha(posicion,this.miAlias);
+            if(!variableLocal){
+                vista.mostrarMensaje("no se pudo ingresar la ficha en la posicion "+ posicion);
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
-        }
-        if(!variableLocal){
-            vista.mostrarMensaje("no se pudo ingresar la ficha en la posicion "+ posicion);
         }
     }
 
@@ -114,24 +117,40 @@ public class Controlador implements IControladorRemoto
         boolean variableLocal = false;
         try {
             variableLocal = juego.moverFicha(posicion1, posicion2, this.miAlias);
+            if(!variableLocal){
+                vista.mostrarMensaje("no se pudo mover la ficha de "+ posicion1 +" a "+ posicion2);
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-        if(!variableLocal){
-                vista.mostrarMensaje("no se pudo mover la ficha de "+ posicion1 +" a "+ posicion2);
-            }
     }
 
     public void eliminarFicha(String posicion){
         boolean variableLocal = false;
         try {
             variableLocal = juego.eliminarFicha(posicion, this.miAlias);
+            if(!variableLocal){
+                vista.mostrarMensaje("no se pudo eliminar la ficha de la posicion "+ posicion);
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-        if(!variableLocal){
-                vista.mostrarMensaje("no se pudo eliminar la ficha de la posicion "+ posicion);
+    }
+
+    public void top5(){
+        try {
+            String[] top = juego.listarTop5();
+            if (top.length == 0) {
+                vista.mostrarMensaje("No hay jugadores con partidas ganadas aún.");
+            } else {
+                vista.mostrarMensaje("Top 5 jugadores:");
+                for (int i = 0; i < top.length; i++) {
+                    vista.mostrarMensaje((i + 1) + ". " + top[i]);
+                }
             }
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -187,6 +206,8 @@ public class Controlador implements IControladorRemoto
             case GANADOR -> {
                 String aliasGanador = juego.consultarGanador();
                 vista.mostrarMensaje("¡El juego ha terminado! Ganador: " + aliasGanador);
+                vista.reiniciarTablero();
+                juego.reiniciar();
             }
 
             default -> {
@@ -196,6 +217,13 @@ public class Controlador implements IControladorRemoto
 
     }
 
+    public void rendirse() {
+        try {
+            juego.rendirse(this.miAlias);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 
 

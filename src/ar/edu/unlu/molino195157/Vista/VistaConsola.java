@@ -16,13 +16,11 @@ public class VistaConsola extends JFrame implements IVista {
     private Controlador controlador;
     private Map<String, JButton> botonesPorPosicion = new HashMap<>();
 
-    public VistaConsola(Controlador controlador) {
+    public VistaConsola() {
         setTitle("Molino - Consola Visual");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
-
-        this.controlador = controlador;
 
         // PANEL PRINCIPAL HORIZONTAL: tablero izquierda, consola derecha
         panelPrincipal = new JPanel(new BorderLayout());
@@ -167,6 +165,12 @@ public class VistaConsola extends JFrame implements IVista {
             case "unirsenegras" -> {
                 controlador.unirseAJuegoNegras();
             }
+            case "top5" -> {
+                controlador.top5();
+            }
+            case "rendirse" -> {
+                controlador.rendirse();
+            }
             case "help" -> {
                 mostrarMensaje("""
                         Comandos disponibles:
@@ -177,11 +181,25 @@ public class VistaConsola extends JFrame implements IVista {
                         • eliminar <posicion>                 - Elimina una ficha del rival
                         • unirseBlancas                       - Se une al juego como jugador blanco
                         • unirseNegras                        - Se une al juego como jugador negro
+                        • rendirse                            - te rendis y gana el rival.
                         • help                                - Muestra este mensaje
                         """);
             }
             default -> mostrarMensaje("Comando no reconocido.");
         }
+    }
+
+    @Override
+    public void reiniciarTablero() {
+        for (Map.Entry<String, JButton> entry : botonesPorPosicion.entrySet()) {
+            String posicion = entry.getKey();
+            JButton boton = entry.getValue();
+
+            boton.setText(posicion);
+            boton.setBackground(Color.GRAY);
+        }
+
+        mostrarMensaje("El tablero ha sido reiniciado.");
     }
 
     @Override
@@ -209,7 +227,7 @@ public class VistaConsola extends JFrame implements IVista {
 
         if (botonDesde != null && botonHasta != null) {
             botonDesde.setText(desde); // Restaurar etiqueta original
-            botonDesde.setBackground(Color.LIGHT_GRAY); // Color por defecto del tablero
+            botonDesde.setBackground(Color.GRAY); // Color por defecto del tablero
 
             botonHasta.setBackground(color);
         } else {
@@ -217,13 +235,12 @@ public class VistaConsola extends JFrame implements IVista {
         }
     }
 
-
     @Override
     public void mostrarFichaEliminada(String posicion) {
         JButton boton = botonesPorPosicion.get(posicion);
         if (boton != null) {
             boton.setText(posicion);
-            boton.setBackground(Color.LIGHT_GRAY);
+            boton.setBackground(Color.GRAY);
         }
     }
 

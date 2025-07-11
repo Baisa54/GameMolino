@@ -1,12 +1,14 @@
 package ar.edu.unlu.molino195157.Modelo.Clases;
 
 import ar.edu.unlu.molino195157.Modelo.Enums.Posicion;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class Tablero {
+public class Tablero implements Serializable {
     //-------------------------------------------------------------------------------------
     // Atributos
     //-------------------------------------------------------------------------------------
@@ -137,6 +139,7 @@ public class Tablero {
             {
                 obtenerCasilla(posicionVariableLocalB).asignarCasillaConFicha(obtenerCasilla(posicionVariableLocalA).getBando());
                 obtenerCasilla(posicionVariableLocalA).eliminarFichaDeCasilla();
+                actualizarMolinos();
                 return true;
             }
             else
@@ -158,6 +161,7 @@ public class Tablero {
         if (obtenerCasilla(posicionVariableLocal).isOcupado() && !Objects.equals(obtenerCasilla(posicionVariableLocal).getBando(), alias))
         {
             obtenerCasilla(posicionVariableLocal).eliminarFichaDeCasilla();
+            actualizarMolinos();
             return true;
         }
         else
@@ -176,5 +180,11 @@ public class Tablero {
             }
         }
         return false;
+    }
+
+    private void actualizarMolinos() {
+        for (CombinacionDeMolino molino : molinos) {
+            molino.actualizarEstado();
+        }
     }
 }
