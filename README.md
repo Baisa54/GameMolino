@@ -18,5 +18,6 @@ El objetivo del juego es crear tantos molinos como sea posible y eliminar las pi
 
 # Diagrama de clases UML
 
-<img width="960" height="1434" alt="Molino_POO (1)" src="https://github.com/user-attachments/assets/365b0fc3-0228-43b3-b1d4-eb2cac07d4c1" />
+![Diagrama del juego](https://github.com/Baisa54/GameMolino/blob/master/.idea/Molino_POO%20(1).png?raw=true)
+
 
