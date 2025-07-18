@@ -36,8 +36,7 @@ public class CombinacionDeMolino implements Serializable {
     // Metodos
     //-------------------------------------------------------------------------------------
 
-    public boolean isMolino()
-    {
+    public boolean isMolino() {
         if (p1.isOcupado() && p2.isOcupado() && p3.isOcupado()) {
             if (p1.getBando().equals(p2.getBando()) && p2.getBando().equals(p3.getBando())) {
                 this.combinacionMolinoOcupada = true;
@@ -50,7 +49,7 @@ public class CombinacionDeMolino implements Serializable {
     public void actualizarEstado() {
         if (p1.isOcupado() && p2.isOcupado() && p3.isOcupado()) {
             if (p1.getBando().equals(p2.getBando()) && p2.getBando().equals(p3.getBando())) {
-                this.combinacionMolinoOcupada = true;
+                //this.combinacionMolinoOcupada = true;
             } else {
                 this.combinacionMolinoOcupada = false;
             }
@@ -58,6 +57,4 @@ public class CombinacionDeMolino implements Serializable {
             this.combinacionMolinoOcupada = false;
         }
     }
-
-
 }

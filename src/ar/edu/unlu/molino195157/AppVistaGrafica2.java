@@ -2,7 +2,6 @@ package ar.edu.unlu.molino195157;
 
 import ar.edu.unlu.molino195157.Controlador.Controlador;
 import ar.edu.unlu.molino195157.Vista.IVista;
-import ar.edu.unlu.molino195157.Vista.VistaConsola;
 import ar.edu.unlu.molino195157.Vista.VistaGrafica;
 import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.Util;
@@ -12,7 +11,7 @@ import javax.swing.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class AppVistaGrafica {
+public class AppVistaGrafica2 {
     public static void main(String[] args) {
         ArrayList<String> ips = Util.getIpDisponibles();
         String ip = (String) JOptionPane.showInputDialog(

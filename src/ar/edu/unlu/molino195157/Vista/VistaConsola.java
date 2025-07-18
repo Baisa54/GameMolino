@@ -29,6 +29,7 @@ public class VistaConsola extends JFrame implements IVista {
         panelTablero = new JPanel(new GridLayout(7, 7));
         panelTablero.setPreferredSize(new Dimension(450, 450)); // Tamaño fijo tablero
         inicializarTablero();
+        panelTablero.setVisible(false);  // Oculta el tablero al inicio
         panelPrincipal.add(panelTablero, BorderLayout.WEST);
 
         // PANEL DERECHO: consola y entrada abajo
@@ -171,6 +172,10 @@ public class VistaConsola extends JFrame implements IVista {
             case "rendirse" -> {
                 controlador.rendirse();
             }
+            case "continuar" -> {
+                controlador.cargarPartida();
+            }
+
             case "help" -> {
                 mostrarMensaje("""
                         Comandos disponibles:
@@ -182,8 +187,10 @@ public class VistaConsola extends JFrame implements IVista {
                         • unirseBlancas                       - Se une al juego como jugador blanco
                         • unirseNegras                        - Se une al juego como jugador negro
                         • rendirse                            - te rendis y gana el rival.
-                        • help                                - Muestra este mensaje
-                        """);
+                        • continuar                           - carga partida anterior.
+                        • top5                                - muestra un listado del top5
+                        • help                                - Muestra este mensaje.
+                       \s""");
             }
             default -> mostrarMensaje("Comando no reconocido.");
         }
@@ -250,6 +257,15 @@ public class VistaConsola extends JFrame implements IVista {
         txtSalida.setCaretPosition(txtSalida.getDocument().getLength());
     }
 
+    @Override
+    public void mostrarPanelJuego() {
+        panelTablero.setVisible(true);
+    }
+
+    @Override
+    public void mostrarPanelInicio() {
+        panelTablero.setVisible(false);
+    }
 }
 
 

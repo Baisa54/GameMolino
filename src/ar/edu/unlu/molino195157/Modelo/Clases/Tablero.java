@@ -187,4 +187,17 @@ public class Tablero implements Serializable {
             molino.actualizarEstado();
         }
     }
+
+    public List<String> obtenerPosicionesDeAlias(String alias) {
+        List<String> posiciones = new ArrayList<>();
+
+        for (Posicion pos : Casillas.keySet()) {
+            Casilla casilla = Casillas.get(pos);
+            if (casilla.isOcupado() && alias.equals(casilla.getBando())) {
+                posiciones.add(pos.toString()); // toString para obtener el nombre como "A1", "D4", etc.
+            }
+        }
+
+        return posiciones;
+    }
 }

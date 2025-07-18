@@ -50,6 +50,11 @@ public class AppServidor {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                juego.guardarPartida();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
             serializador.writeOneObject(Juego.getInstancia());
             System.out.println("Juego guardado automáticamente al cerrar.");
         }));

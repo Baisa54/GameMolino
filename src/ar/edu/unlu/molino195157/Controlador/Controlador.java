@@ -17,7 +17,6 @@ public class Controlador implements IControladorRemoto
 
     // Atributos propios
     private String miAlias;
-    private String rivalAlias;
     // interfaz Vista
     IVista vista;
 
@@ -165,6 +164,7 @@ public class Controlador implements IControladorRemoto
         switch (evento) {
             case COMIENZO -> {
                 vista.mostrarMensaje("¡El juego ha comenzado!");
+                vista.mostrarPanelJuego();
             }
 
             case INGRESOFICHA -> {
@@ -208,6 +208,7 @@ public class Controlador implements IControladorRemoto
                 vista.mostrarMensaje("¡El juego ha terminado! Ganador: " + aliasGanador);
                 vista.reiniciarTablero();
                 juego.reiniciar();
+                vista.mostrarPanelInicio();
             }
 
             default -> {
@@ -219,7 +220,33 @@ public class Controlador implements IControladorRemoto
 
     public void rendirse() {
         try {
-            juego.rendirse(this.miAlias);
+            boolean variableLocal = juego.rendirse(this.miAlias);
+            if (!variableLocal){
+                vista.mostrarMensaje("No fue posible rendirse");
+            }
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void cargarPartida(){
+        try {
+            juego.continuarPartida();
+            vista.mostrarPanelJuego();
+            String[] posiciones = juego.posicionesJugador(this.miAlias);
+            Color color = juego.consultarColor(this.miAlias);
+            for (String pos : posiciones) {
+                vista.mostrarFichaIngresada(pos, color);
+            }
+            posiciones = juego.posicionesContrarias(this.miAlias);
+            if (color.equals(Color.BLACK)) {
+                color = Color.WHITE;
+            } else {
+                color = Color.BLACK;
+            }
+            for (String pos : posiciones) {
+                vista.mostrarFichaIngresada(pos, color);
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

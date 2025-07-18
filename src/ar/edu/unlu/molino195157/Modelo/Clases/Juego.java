@@ -16,6 +16,7 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
     // Atributos
     //-------------------------------------------------------------------------------------
     private static Juego instancia;
+    private JuegoGuardado guardado;
 
     //atributos administrativos
     private List<Jugador> jugadores;
@@ -28,7 +29,6 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
     private String aliasGanador;
 
     //Atributos Propios
-    private int turnoDeLaPartida;
     private int fichasColocadasJugador1;
     private int fichasColocadasJugador2;
     private String turnoDeJugador;
@@ -42,23 +42,19 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
     private String ultimaCasilla;
 
     //-------------------------------------------------------------------------------------
-    // getInstancia
-    //-------------------------------------------------------------------------------------
-
-    //-------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------
 
     private Juego() {
         this.fase = Fase.SIN_COMENZAR;
         this.tablero = new Tablero();
-        this.turnoDeLaPartida = 1;
         this.eliminarFichas = false;
         this.fichasEliminadasJugador1 = 0;
         this.fichasEliminadasJugador2 = 0;
         this.jugadores = new ArrayList<>();
         this.fichasColocadasJugador1 = 0;
         this.fichasColocadasJugador2 = 0;
+        this.guardado = null;
     }
 
     //-------------------------------------------------------------------------------------
@@ -83,7 +79,121 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
     // Getters y Setters
     //-------------------------------------------------------------------------------------
 
-    // no tiene
+    public List<Jugador> getJugadores() {
+        return jugadores;
+    }
+
+    public Jugador getJugador1() {
+        return jugador1;
+    }
+
+    public Jugador getJugador2() {
+        return jugador2;
+    }
+
+    public Tablero getTablero() {
+        return tablero;
+    }
+
+    public Fase getFase() {
+        return fase;
+    }
+
+    public String getAliasGanador() {
+        return aliasGanador;
+    }
+
+    public int getFichasColocadasJugador1() {
+        return fichasColocadasJugador1;
+    }
+
+    public int getFichasColocadasJugador2() {
+        return fichasColocadasJugador2;
+    }
+
+    public boolean isEliminarFichas() {
+        return eliminarFichas;
+    }
+
+    public int getFichasEliminadasJugador1() {
+        return fichasEliminadasJugador1;
+    }
+
+    public int getFichasEliminadasJugador2() {
+        return fichasEliminadasJugador2;
+    }
+
+    public String[] getUltimoMovimientoPosiciones() {
+        return ultimoMovimientoPosiciones;
+    }
+
+    public String getUltimoJugador() {
+        return ultimoJugador;
+    }
+
+    public String getUltimaCasilla() {
+        return ultimaCasilla;
+    }
+
+    public void setJugadores(List<Jugador> jugadores) {
+        this.jugadores = jugadores;
+    }
+
+    public void setJugador1(Jugador jugador1) {
+        this.jugador1 = jugador1;
+    }
+
+    public void setJugador2(Jugador jugador2) {
+        this.jugador2 = jugador2;
+    }
+
+    public void setTablero(Tablero tablero) {
+        this.tablero = tablero;
+    }
+
+    public void setFase(Fase fase) {
+        this.fase = fase;
+    }
+
+    public void setAliasGanador(String aliasGanador) {
+        this.aliasGanador = aliasGanador;
+    }
+
+    public void setFichasColocadasJugador1(int fichasColocadasJugador1) {
+        this.fichasColocadasJugador1 = fichasColocadasJugador1;
+    }
+
+    public void setFichasColocadasJugador2(int fichasColocadasJugador2) {
+        this.fichasColocadasJugador2 = fichasColocadasJugador2;
+    }
+
+    public void setTurnoDeJugador(String turnoDeJugador) {
+        this.turnoDeJugador = turnoDeJugador;
+    }
+
+    public void setEliminarFichas(boolean eliminarFichas) {
+        this.eliminarFichas = eliminarFichas;
+    }
+
+    public void setFichasEliminadasJugador1(int fichasEliminadasJugador1) {
+        this.fichasEliminadasJugador1 = fichasEliminadasJugador1;
+    }
+
+    public void setFichasEliminadasJugador2(int fichasEliminadasJugador2) {
+        this.fichasEliminadasJugador2 = fichasEliminadasJugador2;
+    }
+
+    public void setUltimoMovimientoPosiciones(String[] ultimoMovimientoPosiciones) {
+        this.ultimoMovimientoPosiciones = ultimoMovimientoPosiciones;
+    }
+
+    public void setUltimoJugador(String ultimoJugador) {
+        this.ultimoJugador = ultimoJugador;
+    }
+
+    public void setUltimaCasilla(String ultimaCasilla) {
+        this.ultimaCasilla = ultimaCasilla;
+    }
 
     //-------------------------------------------------------------------------------------
     // Metodos de clase
@@ -99,16 +209,18 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
     }
 
     public void cambiarTurno (String alias) throws RemoteException {
-        this.turnoDeLaPartida += 1;
+        Jugador variableLocal;
         if (this.jugador1.getAlias().equals(alias))
         {
-           this.turnoDeJugador = this.jugador2.getAlias();
-            notificarObservadores(Eventos.CAMBIOTURNO);
+           variableLocal = jugador2;
+        } else {
+            variableLocal = jugador1;
         }
-        else {
-            this.turnoDeJugador = this.jugador1.getAlias();
-            notificarObservadores(Eventos.CAMBIOTURNO);
-        }
+        this.turnoDeJugador = variableLocal.getAlias();
+        System.out.println(variableLocal.getAlias());
+        notificarObservadores(Eventos.CAMBIOTURNO);
+        this.isSegundaFase();
+        this.isFinDePartida();
     }
 
     private boolean aliasEsValido(String alias) {
@@ -184,13 +296,16 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
 
         if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase == Fase.PRIMERA_FASE)
         {
+
             boolean SePudoRealizar = this.tablero.ingresarFicha(alias, posicion);
             if (SePudoRealizar)
             {
                 if (jugador.getAlias().equals(jugador1.getAlias())) {
                     this.fichasColocadasJugador1++;
+                    System.out.println(this.fichasColocadasJugador2);
                 } else if (jugador.getAlias().equals(jugador2.getAlias())) {
                     this.fichasColocadasJugador2++;
+                    System.out.println(this.fichasColocadasJugador1);
                 }
                 this.ultimaCasilla = posicion;
                 this.ultimoJugador = alias;
@@ -203,10 +318,6 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
                 {
                     this.eliminarFichas = true;
                     notificarObservadores(Eventos.MOLINO);
-                }
-                if (this.fichasColocadasJugador1 == 9 && this.fichasColocadasJugador2 == 9) {
-                    this.fase = Fase.SEGUNDA_FASE;
-                    notificarObservadores(Eventos.SEGUNDAFASE);
                 }
             }
             return SePudoRealizar;
@@ -222,7 +333,7 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
         if (!aliasEsValido(alias)) return false;
         Jugador jugador = buscarJugador(alias);
 
-        if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase == Fase.SEGUNDA_FASE)
+        if(jugador.getAlias().equals(this.turnoDeJugador) && this.fase.equals(Fase.SEGUNDA_FASE))
         {
             boolean SePudoRealizar = this.tablero.moverFicha(alias, posicionA, posicionB);
             if (SePudoRealizar)
@@ -232,6 +343,7 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
                 notificarObservadores(Eventos.MUEVEFICHA);
                 if(!this.tablero.verificarSiHayMolino())
                 {
+                    System.out.println("aca hay un problema (Juego movir ficha y no detecta molino en if)");
                     this.cambiarTurno(alias);
                 }
                 else
@@ -269,14 +381,6 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
                 else if (Objects.equals(this.jugador2.getAlias(), alias))
                 {
                     this.fichasEliminadasJugador2 += 1;
-                }
-                if (this.fichasEliminadasJugador1 >= 7 || this.fichasEliminadasJugador2 >= 7)
-                {
-                    this.aliasGanador = alias;
-                    notificarObservadores(Eventos.GANADOR);
-                    this.fase = Fase.FINALIZADO;
-                    buscarJugador(alias).sumarVictoria();
-                    return true;
                 }
                 this.cambiarTurno(alias);
             }
@@ -332,12 +436,12 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
 
         // Resetear estado del juego
         this.fase = Fase.SIN_COMENZAR;
-        this.aliasGanador = null;
-        this.turnoDeLaPartida = 1;
         this.turnoDeJugador = null;
         this.eliminarFichas = false;
         this.fichasEliminadasJugador1 = 0;
         this.fichasEliminadasJugador2 = 0;
+        this.fichasColocadasJugador1 = 0;
+        this.fichasColocadasJugador2 = 0;
 
         this.ultimoMovimientoPosiciones = null;
         this.ultimoJugador = null;
@@ -366,7 +470,8 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
     }
 
     @Override
-    public void rendirse(String alias) throws RemoteException {
+    public boolean rendirse(String alias) throws RemoteException {
+        if (this.fase == Fase.SIN_COMENZAR){return false;}
         if (jugador1.getAlias().equals(alias))
         {
             this.aliasGanador = jugador2.getAlias();
@@ -380,7 +485,75 @@ public class Juego extends ObservableRemoto implements IJuego, Serializable {
             this.fase = Fase.FINALIZADO;
             jugador1.sumarVictoria();
         }
+        return true;
+    }
+
+    @Override
+    public boolean continuarPartida() throws RemoteException {
+        if (this.guardado != null) {
+            guardado.restaurarEstado();
+            this.guardado = null;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void guardarPartida() throws RemoteException {
+        this.guardado = new JuegoGuardado();
+        reiniciar();
+    }
+
+    @Override
+    public String[] posicionesJugador(String alias) throws RemoteException {
+        List<String> posiciones = tablero.obtenerPosicionesDeAlias(alias);
+        return posiciones.toArray(new String[0]);
+    }
+
+    @Override
+    public String[] posicionesContrarias(String alias) throws RemoteException {
+        String aliasContrario = null;
+        if (jugador1 != null && jugador1.getAlias().equals(alias) && jugador2 != null) {
+            aliasContrario = jugador2.getAlias();
+        } else if (jugador2 != null && jugador2.getAlias().equals(alias) && jugador1 != null) {
+            aliasContrario = jugador1.getAlias();
+        }
+
+        if (aliasContrario != null) {
+            List<String> posiciones = tablero.obtenerPosicionesDeAlias(aliasContrario);
+            return posiciones.toArray(new String[0]);
+        }
+
+        return new String[0];
+    }
+
+    private void isSegundaFase() throws RemoteException {
+        if (this.fichasColocadasJugador1 >= 9 && this.fichasColocadasJugador2 >= 9 && this.fase.equals(Fase.PRIMERA_FASE)){
+            this.fase = Fase.SEGUNDA_FASE;
+            System.out.println(this.fase);
+            notificarObservadores(Eventos.SEGUNDAFASE);
+        }
+    }
+
+    private void isFinDePartida() throws RemoteException {
+        if ((this.fichasEliminadasJugador1 >= 7 || this.fichasEliminadasJugador2 >= 7) && this.fase == Fase.SEGUNDA_FASE)
+        {
+            if(this.fichasEliminadasJugador1 >= 7){
+                this.aliasGanador = jugador1.getAlias();
+                jugador1.sumarVictoria();
+                this.guardado = null;
+            }
+            else{
+                this.aliasGanador = jugador2.getAlias();
+                jugador2.sumarVictoria();
+                this.guardado = null;
+            }
+            notificarObservadores(Eventos.GANADOR);
+            this.fase = Fase.FINALIZADO;
+        }
     }
 }
+
+
 
 

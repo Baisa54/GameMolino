@@ -50,5 +50,13 @@ public interface IJuego extends IObservableRemoto {
 
     public String[] listarTop5() throws RemoteException;
 
-    public void rendirse (String alias) throws  RemoteException;
+    public boolean rendirse (String alias) throws  RemoteException;
+
+    public boolean continuarPartida() throws RemoteException;
+
+    public void guardarPartida() throws RemoteException;
+
+    public String[] posicionesJugador(String alias) throws RemoteException;
+
+    public String[] posicionesContrarias(String alias) throws RemoteException;
 }

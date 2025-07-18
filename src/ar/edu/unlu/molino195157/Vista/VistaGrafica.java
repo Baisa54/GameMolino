@@ -22,8 +22,13 @@ public class VistaGrafica extends JFrame implements IVista {
     private String posicionOrigen = null;
     private final Queue<String> colaMensajes = new LinkedList<>();
     private boolean dialogoAbierto = false;
-
-
+    private CardLayout layoutMensajes;
+    private JPanel contenedorVistas;
+    private JTextArea areaChat;
+    private CardLayout layoutAcciones;
+    private JPanel contenedorAcciones; // Contenedor con CardLayout
+    private JPanel panelInicio; // botones de registrarse, etc.
+    private JPanel panelJuego;  // botones de jugar (ingresar, mover, eliminar)
     private Controlador controlador;
 
     public VistaGrafica() {
@@ -39,8 +44,9 @@ public class VistaGrafica extends JFrame implements IVista {
         construirPanelMensajes();
 
         panelPrincipal.add(panelTablero, BorderLayout.CENTER);
-        panelPrincipal.add(panelAcciones, BorderLayout.EAST);
-        panelPrincipal.add(panelMensajes, BorderLayout.WEST);
+        panelPrincipal.add(panelAcciones, BorderLayout.WEST);
+        panelPrincipal.add(panelMensajes, BorderLayout.EAST);
+
 
         setContentPane(panelPrincipal);
     }
@@ -105,10 +111,55 @@ public class VistaGrafica extends JFrame implements IVista {
 
 
     private void construirPanelAcciones() {
-        panelAcciones = new JPanel();
-        panelAcciones.setLayout(new GridLayout(4, 1, 5, 5)); // 4 botones: 3 acciones + Rendirse
-        panelAcciones.setPreferredSize(new Dimension(150, 600));
+        layoutAcciones = new CardLayout();
+        contenedorAcciones = new JPanel(layoutAcciones);
+        contenedorAcciones.setPreferredSize(new Dimension(200, 600));
 
+        panelInicio = new JPanel();
+        panelInicio.setLayout(new BoxLayout(panelInicio, BoxLayout.Y_AXIS));
+        JButton btnRegistrarse = new JButton("Registrarse");
+        JButton btnIniciarSesion = new JButton("Iniciar Sesión");
+        JButton btnElegirBlancas = new JButton("Elegir Blancas");
+        JButton btnElegirNegras = new JButton("Elegir Negras");
+        JButton btnTop5 = new JButton("Top 5");
+        JButton btnContinuar = new JButton("Continuar Partida");
+
+        Dimension tamanoBoton = new Dimension(180, 40);
+        JButton[] botones = {
+                btnRegistrarse, btnIniciarSesion, btnElegirBlancas,
+                btnElegirNegras, btnTop5, btnContinuar
+        };
+
+        for (JButton boton : botones) {
+            boton.setMaximumSize(tamanoBoton);
+            boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
+
+        btnContinuar.addActionListener(e -> controlador.cargarPartida());
+        btnRegistrarse.addActionListener(e -> mostrarVentanaRegistro());
+        btnIniciarSesion.addActionListener(e -> mostrarVentanaInicioSesion());
+        btnElegirBlancas.addActionListener(e -> controlador.unirseAJuegoBlancas());
+        btnElegirNegras.addActionListener(e -> controlador.unirseAJuegoNegras());
+        btnTop5.addActionListener(e -> controlador.top5());
+
+        int espaciado = 10;
+
+        panelInicio.add(Box.createVerticalStrut(espaciado));
+        panelInicio.add(btnRegistrarse);
+        panelInicio.add(Box.createVerticalStrut(espaciado));
+        panelInicio.add(btnIniciarSesion);
+        panelInicio.add(Box.createVerticalStrut(espaciado));
+        panelInicio.add(btnElegirBlancas);
+        panelInicio.add(Box.createVerticalStrut(espaciado));
+        panelInicio.add(btnElegirNegras);
+        panelInicio.add(Box.createVerticalStrut(espaciado));
+        panelInicio.add(btnTop5);
+        panelInicio.add(Box.createVerticalStrut(espaciado));
+        panelInicio.add(btnContinuar);
+        panelInicio.add(Box.createVerticalGlue());
+
+
+        panelJuego = new JPanel(new GridLayout(4, 1, 10, 10));
         btnIngresar = crearBotonAccion("Ingresar");
         btnEliminar = crearBotonAccion("Eliminar");
         btnMover = crearBotonAccion("Mover");
@@ -117,7 +168,6 @@ public class VistaGrafica extends JFrame implements IVista {
         btnRendirse.setFont(new Font("Arial", Font.BOLD, 16));
         btnRendirse.setBackground(new Color(128, 0, 0)); // Bordó oscuro
         btnRendirse.setForeground(Color.WHITE);
-
         btnRendirse.addActionListener(e -> {
             int opcion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que querés rendirte?", "Confirmar Rendición", JOptionPane.YES_NO_OPTION);
             if (opcion == JOptionPane.YES_OPTION) {
@@ -125,12 +175,17 @@ public class VistaGrafica extends JFrame implements IVista {
             }
         });
 
+        panelJuego.add(btnIngresar);
+        panelJuego.add(btnEliminar);
+        panelJuego.add(btnMover);
+        panelJuego.add(btnRendirse);
 
-        panelAcciones.add(btnIngresar);
-        panelAcciones.add(btnEliminar);
-        panelAcciones.add(btnMover);
-        panelAcciones.add(btnRendirse);
+        contenedorAcciones.add(panelInicio, "INICIO");
+        contenedorAcciones.add(panelJuego, "JUEGO");
+
+        panelAcciones = contenedorAcciones;
     }
+
 
     private void actualizarBotonesAccion() {
         Color activo = new Color(0, 128, 0);     // Verde oscuro
@@ -151,30 +206,18 @@ public class VistaGrafica extends JFrame implements IVista {
         }
     }
 
-
     private void construirPanelMensajes() {
-        panelMensajes = new JPanel();
-        panelMensajes.setLayout(new GridLayout(5, 1, 10, 10));
+        panelMensajes = new JPanel(new BorderLayout());
         panelMensajes.setPreferredSize(new Dimension(200, 600));
-        panelMensajes.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        JButton btnRegistrarse = new JButton("Registrarse");
-        JButton btnIniciarSesion = new JButton("Iniciar Sesión");
-        JButton btnElegirBlancas = new JButton("Elegir Blancas");
-        JButton btnElegirNegras = new JButton("Elegir Negras");
-        JButton btnTop5 = new JButton("Top 5");
-        btnTop5.addActionListener(e -> controlador.top5());
-        btnRegistrarse.addActionListener(e -> mostrarVentanaRegistro());
-        btnIniciarSesion.addActionListener(e -> mostrarVentanaInicioSesion());
-        btnElegirBlancas.addActionListener(e -> controlador.unirseAJuegoBlancas());
-        btnElegirNegras.addActionListener(e -> controlador.unirseAJuegoNegras());
-        btnTop5.addActionListener(e -> controlador.top5());
+        areaChat = new JTextArea();
+        areaChat.setEditable(false);
+        areaChat.setLineWrap(true);
+        areaChat.setWrapStyleWord(true);
 
-        panelMensajes.add(btnRegistrarse);
-        panelMensajes.add(btnIniciarSesion);
-        panelMensajes.add(btnElegirBlancas);
-        panelMensajes.add(btnElegirNegras);
-        panelMensajes.add(btnTop5);
+        JScrollPane scrollChat = new JScrollPane(areaChat);
+
+        panelMensajes.add(scrollChat, BorderLayout.CENTER);
     }
 
 
@@ -223,12 +266,10 @@ public class VistaGrafica extends JFrame implements IVista {
 
     @Override
     public void mostrarMensaje(String mensaje) {
-        synchronized (colaMensajes) {
-            colaMensajes.add(mensaje);
-            if (!dialogoAbierto) {
-                mostrarSiguienteMensaje();
-            }
-        }
+        SwingUtilities.invokeLater(() -> {
+            areaChat.append("• " + mensaje + "\n");
+            areaChat.setCaretPosition(areaChat.getDocument().getLength()); // auto-scroll al final
+        });
     }
 
     private void mostrarSiguienteMensaje() {
@@ -299,5 +340,15 @@ public class VistaGrafica extends JFrame implements IVista {
         if (opcion == JOptionPane.OK_OPTION) {
             controlador.iniciarSesion(alias.getText(), new String(contrasena.getPassword()));
         }
+    }
+
+    @Override
+    public void mostrarPanelJuego() {
+        layoutAcciones.show(contenedorAcciones, "JUEGO");
+    }
+
+    @Override
+    public void mostrarPanelInicio() {
+        layoutAcciones.show(contenedorAcciones, "INICIO");
     }
 }

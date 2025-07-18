@@ -17,4 +17,6 @@ public interface IVista {
     public void mostrarFichaEliminada(String posicion);
     public void mostrarMensaje(String mensaje);
     public void reiniciarTablero();
+    public void mostrarPanelJuego();
+    public void mostrarPanelInicio();
 }
